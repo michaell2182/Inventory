@@ -1,5 +1,30 @@
 import React from "react";
 import { View, StyleSheet, Text } from "react-native";
+import { Svg, Path } from "react-native-svg";
+
+const UpTrendIcon = () => (
+  <Svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+    <Path 
+      d="M3 17L9 11L13 15L21 7M21 7H15M21 7V13" 
+      stroke="#16A34A" 
+      strokeWidth="2" 
+      strokeLinecap="round" 
+      strokeLinejoin="round"
+    />
+  </Svg>
+);
+
+const DownTrendIcon = () => (
+  <Svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+    <Path 
+      d="M3 7L9 13L13 9L21 17M21 17V11M21 17H15" 
+      stroke="#DC2626" 
+      strokeWidth="2" 
+      strokeLinecap="round" 
+      strokeLinejoin="round"
+    />
+  </Svg>
+);
 
 const QuickAction = () => {
   return (
@@ -12,6 +37,9 @@ const QuickAction = () => {
               <Text style={styles.icon}>$</Text>
             </View>
             <Text style={styles.label}>PROFIT</Text>
+            <View style={styles.trendContainer}>
+              <UpTrendIcon />
+            </View>
           </View>
           <Text style={styles.amount}>$296,913.00</Text>
         </View>
@@ -21,6 +49,9 @@ const QuickAction = () => {
               <Text style={styles.icon}>$</Text>
             </View>
             <Text style={styles.label}>SALES COST</Text>
+            <View style={styles.trendContainer}>
+              <DownTrendIcon />
+            </View>
           </View>
           <Text style={styles.amount}>$9,981.00</Text>
         </View>
@@ -74,6 +105,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
+    justifyContent: 'space-between',
   },
   circle: {
     width: 32,
@@ -137,6 +169,9 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     color: '#6b7280',
     textAlign: 'center',
+  },
+  trendContainer: {
+    marginLeft: 'auto',
   },
 });
 
