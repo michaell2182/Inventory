@@ -18,17 +18,14 @@ interface ListItemData {
 const ListItem = ({ item }: { item: ListItemData }) => (
   <View style={styles.listItem}>
     <View style={styles.leftContent}>
-      <View style={styles.itemCircle} />
-      <View>
-        <Text style={styles.itemTitle}>{item.title}</Text>
-        <Text style={styles.itemPrice}>{item.price}</Text>
+      <Text style={styles.itemTitle}>{item.title}</Text>
+      <Text style={styles.itemPrice}>{item.price} · {item.quantity} QTY</Text>
+      <View style={styles.detailsWrapper}>
+        <Text style={styles.detailsButton}>Details</Text>
       </View>
     </View>
-    <View style={styles.quantityContainer}>
-      <View style={styles.quantityWrapper}>
-        <Text style={styles.quantity}>{item.quantity} QTY</Text>
-      </View>
-      <Text style={styles.chevron}>›</Text>
+    <View style={styles.imageContainer}>
+      <View style={styles.image} />
     </View>
   </View>
 );
@@ -40,6 +37,7 @@ const ListHeader = () => (
 const MiniList = () => {
   return (
     <View style={styles.wrapper}>
+      <Text style={styles.sectionTitle}>Products</Text>
       <View style={styles.container}>
         <FlatList
           data={listData}
@@ -58,76 +56,72 @@ const MiniList = () => {
 
 const styles = StyleSheet.create({
   wrapper: {
-    marginTop: 56,
-    paddingHorizontal: 16,
+    marginTop: 24,
+    paddingHorizontal: 0,
     flex: 1,
   },
   container: {
     backgroundColor: '#fff',
     borderRadius: 24,
     flex: 1,
+    marginHorizontal: 16,
   },
   listContent: {
-    padding: 16,
+    padding: 8,
   },
   headerLine: {
-    width: 40,
-    height: 4,
-    backgroundColor: '#f3f4f6',
-    borderRadius: 2,
-    alignSelf: 'center',
-    marginBottom: 16,
+
   },
   listItem: {
-    backgroundColor: '#f9fafb',
-    borderRadius: 16,
-    padding: 19,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 12,
+    paddingVertical: 16,
+    paddingHorizontal: 12,
+    borderWidth: 1,
+    borderColor: '#e5e7eb',
+    borderRadius: 12,
+    marginBottom: 8,
   },
   leftContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-  },
-  itemCircle: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: '#f3f4f6',
+    gap: 4,
   },
   itemTitle: {
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: '700',
   },
   itemPrice: {
     fontSize: 14,
     color: '#6b7280',
   },
-  quantityContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 14,
-  },
-  quantity: {
-    fontSize: 14,
-    color: '#6b7280',
-    fontWeight: '500',
-  },
-  chevron: {
-    fontSize: 26,
-    color: '#6b7280',
-    alignSelf: 'center',
-  },
-  quantityWrapper: {
-    backgroundColor: '#f3f4f6',
+  detailsWrapper: {
+    backgroundColor: '#efefef',
+    alignSelf: 'flex-start',
     paddingHorizontal: 12,
     paddingVertical: 6,
-    borderRadius: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
+    borderRadius: 6,
+    marginTop: 8,
+  },
+  detailsButton: {
+    fontSize: 14,
+    color: 'black',
+  },
+  imageContainer: {
+    width: 80,
+    height: 80,
+    borderRadius: 8,
+    overflow: 'hidden',
+  },
+  image: {
+    backgroundColor: '#f3f4f6',
+    width: '100%',
+    height: '100%',
+  },
+  sectionTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    marginBottom: 16,
+    paddingLeft: 24,
   },
 });
 

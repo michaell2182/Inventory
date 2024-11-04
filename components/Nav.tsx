@@ -1,43 +1,21 @@
-import { View, Image, TouchableOpacity, StyleSheet } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { View, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
-// Add type definition for your routes
-type RootStackParamList = {
-  Home: undefined;
-  // Add other routes here
-};
-
 const Nav = () => {
-  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
-
   return (
     <View style={styles.navContainer}>
       <View style={styles.navContent}>
         {/* Left side - Profile Image */}
-        <TouchableOpacity 
-          onPress={() => navigation.navigate('Home')}
-          style={styles.profileContainer}
-        >
-          <Image
-            source={require('../assets/images/TestImage.jpg')} // Update path to your image
-            style={styles.profileImage}
-          />
-        </TouchableOpacity>
+        <View style={styles.profileCircle} />
 
-        {/* Right side - Navigation Icons */}
+        {/* Right side - Icons */}
         <View style={styles.iconsContainer}>
-          <TouchableOpacity style={styles.iconButton}>
-            <View style={styles.iconCircle}>
-              <Ionicons name="notifications-outline" size={30} color="#4b5563" />
-            </View>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.iconButton}>
-            <View style={styles.iconCircle}>
-              <Ionicons name="camera-outline" size={30} color="#4b5563" />
-            </View>
-          </TouchableOpacity>
+          <View style={styles.iconCircle}>
+            <Ionicons name="notifications-outline" size={24} color="#4b5563" />
+          </View>
+          <View style={styles.iconCircle}>
+            <Ionicons name="camera-outline" size={24} color="#4b5563" />
+          </View>
         </View>
       </View>
     </View>
@@ -46,40 +24,32 @@ const Nav = () => {
 
 const styles = StyleSheet.create({
   navContainer: {
-    backgroundColor: '#f5f5f5',
-    
-    borderBottomColor: '#e5e7eb',
-    paddingTop: 24,
+    backgroundColor: '#fff',
+    paddingTop: 24, // Adjust based on your device's status bar
+
   },
   navContent: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 16,
-    height: 56,
+    paddingVertical: 12,
   },
-  profileContainer: {
-    height: 62,
-    width: 62,
-    borderRadius: 100,
-    overflow: 'hidden',
-  },
-  profileImage: {
-    height: '100%',
-    width: '100%',
+  profileCircle: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#f3f4f6',
   },
   iconsContainer: {
     flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-  },
-  iconButton: {
-    padding: 8,
+    gap: 12,
   },
   iconCircle: {
-    height: 44,
-    width: 44,
-    borderRadius: 18,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'white',
     justifyContent: 'center',
     alignItems: 'center',
   },

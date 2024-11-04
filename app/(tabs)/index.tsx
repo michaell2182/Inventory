@@ -21,23 +21,21 @@ const Main = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f5f5f5",
+    backgroundColor: '#fff',
   },
   greetingContainer: {
     paddingHorizontal: 16,
-    marginTop: 20,
+    paddingTop: 12,
   },
   greeting: {
-    fontSize: 36,
-    fontWeight: "600",
-    color: "#000",
-    marginTop:  4,
+    fontSize: 30,
+    fontWeight: '600',
+    color: '#000',
   },
   date: {
-    fontSize: 22,
-    color: "#6b7280",
-    marginTop: 4,
-    fontWeight: "500",
+    fontSize: 14,
+    color: '#6b7280',
+    marginTop: 6,
   },
 });
 

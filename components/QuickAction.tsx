@@ -28,17 +28,19 @@ const QuickAction = () => {
 
       {/* Bottom Quick Action Buttons */}
       <View style={styles.buttonsContainer}>
-        <View style={styles.actionButton}>
-          
+        <View style={styles.topButtons}>
+          <View style={[styles.actionButton, styles.activeButton]}>
+            <Text style={[styles.buttonText, styles.activeButtonText]}>Today</Text>
+          </View>
+          <View style={[styles.actionButton, { marginHorizontal: 8 }]}>
+            <Text style={styles.buttonText}>This Week</Text>
+          </View>
+          <View style={styles.actionButton}>
+            <Text style={styles.buttonText}>This Month</Text>
+          </View>
         </View>
-        <View style={styles.actionButton}>
-         
-        </View>
-        <View style={styles.actionButton}>
-        
-        </View>
-        <View style={styles.actionButton}>
-         
+        <View style={[styles.actionButton, styles.customButton]}>
+          <Text style={styles.customButtonText}>Custom</Text>
         </View>
       </View>
     </View>
@@ -48,17 +50,25 @@ const QuickAction = () => {
 const styles = StyleSheet.create({
   cardsContainer: {
     flexDirection: "row",
-    gap: 16,
     paddingHorizontal: 16,
-    marginTop: 48,
-    
+    marginTop: 24,
   },
   actionItem: {
-    backgroundColor: "#fff",
-    borderRadius: 20,
-    height: 100,
     flex: 1,
     padding: 16,
+    borderWidth: 1,
+    borderColor: '#e5e7eb',
+    borderRadius: 12,
+    marginHorizontal: 8,
+    backgroundColor: 'white',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
   },
   topContainer: {
     flexDirection: 'row',
@@ -66,48 +76,67 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   circle: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: "#f3f4f6",
-    alignSelf: 'flex-start',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  icon: {
-    fontSize: 20,
-    color: '#6b7280',
-  },
-  amount: {
-    fontSize: 20,
-    fontWeight: '600',
-    marginTop: 8,
-  },
-  label: {
-    fontSize: 12,
-    color: '#6b7280',
-  },
-  buttonsContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    paddingHorizontal: 16,
-    marginTop: 16,
-    gap: 12,
-  },
-  actionButton: {
-    backgroundColor: "#fff",
-    borderRadius: 16,
-    width: 60,
-    height: 60,
-    justifyContent: "center",
-    alignItems: "center",
-    marginTop:32,
-  },
-  buttonCircle: {
     width: 32,
     height: 32,
     borderRadius: 16,
     backgroundColor: "#f3f4f6",
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  icon: {
+    fontSize: 16,
+    color: '#6b7280',
+  },
+  amount: {
+    fontSize: 24,
+    fontWeight: '600',
+    marginTop: 8,
+    color: '#111827',
+  },
+  label: {
+    fontSize: 12,
+    fontWeight: '500',
+    color: '#6b7280',
+  },
+  buttonsContainer: {
+    paddingHorizontal: 24,
+    marginTop: 24,
+    gap: 12,
+    width: '80%',
+    alignSelf: 'center', 
+  },
+  topButtons: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    width: '100%',
+  },
+  actionButton: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 6,
+    backgroundColor: '#f3f4f6',
+  },
+  activeButton: {
+    backgroundColor: '#000',
+  },
+  customButton: {
+    backgroundColor: '#f3f4f6',
+    paddingVertical: 12,
+    width: '100%',
+  },
+  buttonText: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#6b7280',
+  },
+  activeButtonText: {
+    color: '#fff',
+  },
+  customButtonText: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#6b7280',
+    textAlign: 'center',
   },
 });
 
