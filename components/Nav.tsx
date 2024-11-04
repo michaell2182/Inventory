@@ -1,6 +1,7 @@
 import { View, Image, TouchableOpacity, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { Ionicons } from '@expo/vector-icons';
 
 // Add type definition for your routes
 type RootStackParamList = {
@@ -28,10 +29,14 @@ const Nav = () => {
         {/* Right side - Navigation Icons */}
         <View style={styles.iconsContainer}>
           <TouchableOpacity style={styles.iconButton}>
-            <View style={styles.iconCircle} />
+            <View style={styles.iconCircle}>
+              <Ionicons name="notifications-outline" size={30} color="#4b5563" />
+            </View>
           </TouchableOpacity>
           <TouchableOpacity style={styles.iconButton}>
-            <View style={styles.iconCircle} />
+            <View style={styles.iconCircle}>
+              <Ionicons name="camera-outline" size={30} color="#4b5563" />
+            </View>
           </TouchableOpacity>
         </View>
       </View>
@@ -66,7 +71,7 @@ const styles = StyleSheet.create({
   iconsContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
+    gap: 6,
   },
   iconButton: {
     padding: 8,
@@ -75,7 +80,8 @@ const styles = StyleSheet.create({
     height: 44,
     width: 44,
     borderRadius: 18,
-    backgroundColor: '#d1d5db',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 
