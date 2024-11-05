@@ -162,9 +162,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#000',
   },
   customButton: {
-    backgroundColor: '#f3f4f6',
-    paddingVertical: 12,
+    backgroundColor: '#000',
+    paddingVertical: 16,
     width: '100%',
+    borderRadius: 12,
+    alignItems: 'center',
+    marginVertical: 16,
   },
   buttonText: {
     fontSize: 14,
@@ -175,9 +178,9 @@ const styles = StyleSheet.create({
     color: '#fff',
   },
   customButtonText: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: '#6b7280',
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#fff',
     textAlign: 'center',
   },
   trendContainer: {
