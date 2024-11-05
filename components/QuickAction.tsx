@@ -1,6 +1,7 @@
 import React from "react";
-import { View, StyleSheet, Text } from "react-native";
+import { View, StyleSheet, Text, TouchableOpacity } from "react-native";
 import { Svg, Path } from "react-native-svg";
+import { useRouter } from 'expo-router';
 
 const UpTrendIcon = () => (
   <Svg width="24" height="24" viewBox="0 0 24 24" fill="none">
@@ -27,6 +28,12 @@ const DownTrendIcon = () => (
 );
 
 const QuickAction = () => {
+  const router = useRouter();
+
+  const handleSalesPress = () => {
+    router.push('/sales');
+  };
+
   return (
     <View>
       {/* Top Cards */}
@@ -70,9 +77,12 @@ const QuickAction = () => {
             <Text style={styles.buttonText}>This Month</Text>
           </View>
         </View>
-        <View style={[styles.actionButton, styles.customButton]}>
-          <Text style={styles.customButtonText}>Custom</Text>
-        </View>
+        <TouchableOpacity
+          style={[styles.actionButton, styles.customButton]}
+          onPress={handleSalesPress}
+        >
+          <Text style={styles.customButtonText}>Sales Record</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );

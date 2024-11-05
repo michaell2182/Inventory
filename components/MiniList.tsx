@@ -58,7 +58,12 @@ const MiniList = () => {
       <View style={styles.container}>
         <FlatList
           data={products}
-          renderItem={({ item }) => <ListItem item={item} />}
+          renderItem={({ item }) => (
+            <ListItem 
+              item={item} 
+              onPress={() => {}}
+            />
+          )}
           keyExtractor={(item) => item.id}
           ListHeaderComponent={ListHeader}
           showsVerticalScrollIndicator={false}
