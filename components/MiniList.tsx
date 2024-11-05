@@ -1,33 +1,26 @@
 import React from "react";
-import { View, Text, StyleSheet, FlatList } from "react-native";
+import { View, Text, StyleSheet, FlatList, Image, TouchableOpacity } from "react-native";
+import { useInventory } from '../store/InventoryContext';
+import { Product } from '../types/inventory';
+// import { useInventoryActions } from '../hooks/useInventoryActions';
 
-const listData = [
-  { title: "Iphone", price: "$500", quantity: 5 },
-  { title: "Macbook Pro", price: "$1299", quantity: 2 },
-  { title: "AirPods", price: "$199", quantity: 3 },
-  { title: "iPad", price: "$799", quantity: 1 },
-  { title: "Apple Watch", price: "$399", quantity: 4 },
-];
-
-interface ListItemData {
-  title: string;
-  price: string;
-  quantity: number;
-}
-
-const ListItem = ({ item }: { item: ListItemData }) => (
-  <View style={styles.listItem}>
+const ListItem = ({ item, onPress }: { item: Product; onPress: () => void }) => (
+  <TouchableOpacity onPress={onPress} style={styles.listItem}>
     <View style={styles.leftContent}>
       <Text style={styles.itemTitle}>{item.title}</Text>
-      <Text style={styles.itemPrice}>{item.price} · {item.quantity} QTY</Text>
+      <Text style={styles.itemPrice}>${item.price.toFixed(2)} · {item.quantity} QTY</Text>
       <View style={styles.detailsWrapper}>
         <Text style={styles.detailsButton}>Details</Text>
       </View>
     </View>
     <View style={styles.imageContainer}>
-      <View style={styles.image} />
+      {item.image_url ? (
+        <Image source={{ uri: item.image_url }} style={styles.image} />
+      ) : (
+        <View style={styles.image} />
+      )}
     </View>
-  </View>
+  </TouchableOpacity>
 );
 
 const ListHeader = () => (
@@ -35,14 +28,38 @@ const ListHeader = () => (
 );
 
 const MiniList = () => {
+  const { state } = useInventory();
+  // const { addTestData } = useInventoryActions();
+  const { products, isLoading, error } = state;
+
+  // const handleAddTestData = () => {
+  //   addTestData();
+  // };
+
+  if (isLoading) {
+    return <View style={styles.wrapper}><Text>Loading...</Text></View>;
+  }
+
+  if (error) {
+    return <View style={styles.wrapper}><Text>Error: {error}</Text></View>;
+  }
+
   return (
     <View style={styles.wrapper}>
-      <Text style={styles.sectionTitle}>Products</Text>
+      <View style={styles.headerContainer}>
+        <Text style={styles.sectionTitle}>Products</Text>
+        {/* <TouchableOpacity 
+          style={styles.addButton} 
+          onPress={handleAddTestData}
+        >
+          <Text style={styles.addButtonText}>Add Test Data</Text>
+        </TouchableOpacity> */}
+      </View>
       <View style={styles.container}>
         <FlatList
-          data={listData}
+          data={products}
           renderItem={({ item }) => <ListItem item={item} />}
-          keyExtractor={(item, index) => index.toString()}
+          keyExtractor={(item) => item.id}
           ListHeaderComponent={ListHeader}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.listContent}
@@ -56,7 +73,7 @@ const MiniList = () => {
 
 const styles = StyleSheet.create({
   wrapper: {
-    marginTop: 24,
+    marginTop: 62,
     paddingHorizontal: 0,
     flex: 1,
   },
@@ -119,9 +136,27 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 20,
-    fontWeight: '700',
-    marginBottom: 16,
-    paddingLeft: 24,
+    fontWeight: '600',
+    // marginBottom: 16,
+    paddingLeft: 3,
+  },
+  headerContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 24,
+    marginBottom: 12,
+  },
+  addButton: {
+    backgroundColor: '#000',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 6,
+  },
+  addButtonText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '500',
   },
 });
 

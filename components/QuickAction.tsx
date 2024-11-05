@@ -82,7 +82,7 @@ const styles = StyleSheet.create({
   cardsContainer: {
     flexDirection: "row",
     paddingHorizontal: 16,
-    marginTop: 24,
+    marginTop: 42,
   },
   actionItem: {
     flex: 1,
@@ -132,7 +132,7 @@ const styles = StyleSheet.create({
   },
   buttonsContainer: {
     paddingHorizontal: 24,
-    marginTop: 24,
+    marginTop: 46,
     gap: 12,
     width: '80%',
     alignSelf: 'center', 

@@ -1,23 +1,95 @@
-import { View, StyleSheet } from 'react-native';
+import React, { useState } from 'react';
+import { View, StyleSheet, TouchableOpacity, Text } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import * as ImagePicker from 'expo-image-picker';
+import ImagePickerModal from './ImagePickerModal';
+import AddProductForm from './AddProductForm';
 
 const Nav = () => {
+  const [imagePickerVisible, setImagePickerVisible] = useState(false);
+  const [formVisible, setFormVisible] = useState(false);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleCameraPress = () => {
+    setImagePickerVisible(true);
+  };
+
+  const handleCamera = async () => {
+    setImagePickerVisible(false);
+    
+    const permissionResult = await ImagePicker.requestCameraPermissionsAsync();
+    if (permissionResult.granted === false) {
+      alert("Camera permission is required!");
+      return;
+    }
+
+    const result = await ImagePicker.launchCameraAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      setSelectedImage(result.assets[0].uri);
+      setFormVisible(true);
+    }
+  };
+
+  const handleGallery = async () => {
+    setImagePickerVisible(false);
+
+    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (permissionResult.granted === false) {
+      alert("Gallery permission is required!");
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      setSelectedImage(result.assets[0].uri);
+      setFormVisible(true);
+    }
+  };
+
   return (
     <View style={styles.navContainer}>
       <View style={styles.navContent}>
-        {/* Left side - Profile Image */}
         <View style={styles.profileCircle} />
-
-        {/* Right side - Icons */}
         <View style={styles.iconsContainer}>
           <View style={styles.iconCircle}>
             <Ionicons name="notifications-outline" size={24} color="#4b5563" />
           </View>
-          <View style={styles.iconCircle}>
+          <TouchableOpacity style={styles.iconCircle} onPress={handleCameraPress}>
             <Ionicons name="camera-outline" size={24} color="#4b5563" />
-          </View>
+          </TouchableOpacity>
         </View>
       </View>
+
+      <ImagePickerModal
+        visible={imagePickerVisible}
+        onClose={() => setImagePickerVisible(false)}
+        onSelectCamera={handleCamera}
+        onSelectGallery={handleGallery}
+      />
+
+      {selectedImage && (
+        <AddProductForm
+          visible={formVisible}
+          onClose={() => {
+            setFormVisible(false);
+            setSelectedImage(null);
+          }}
+          imageUri={selectedImage}
+        />
+      )}
     </View>
   );
 };
@@ -52,6 +124,19 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  submitButton: {
+    backgroundColor: '#4b5563',
+    padding: 10,
+    borderRadius: 5,
+    alignItems: 'center',
+  },
+  submitButtonText: {
+    color: '#fff',
+    fontSize: 16,
+  },
+  submitButtonDisabled: {
+    backgroundColor: '#ccc',
   },
 });
 

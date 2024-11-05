@@ -3,18 +3,21 @@ import { View, Text, SafeAreaView, StyleSheet } from "react-native";
 import Nav from "../../components/Nav";
 import QuickAction from "../../components/QuickAction";
 import MiniList from "../../components/MiniList";
+import { InventoryProvider } from '../../store/InventoryContext';
 
 const Main = () => {
   return (
-    <SafeAreaView style={styles.container}>
-      <Nav />
-      <View style={styles.greetingContainer}>
-        <Text style={styles.greeting}>Hello, Michael</Text>
-        <Text style={styles.date}>Tue, 3 Aug</Text>
-      </View>
-      <QuickAction />
-      <MiniList />
-    </SafeAreaView>
+    <InventoryProvider>
+      <SafeAreaView style={styles.container}>
+        <Nav />
+        <View style={styles.greetingContainer}>
+          <Text style={styles.greeting}>Hello, Michael</Text>
+          <Text style={styles.date}>Tue, 3 Aug</Text>
+        </View>
+        <QuickAction />
+        <MiniList />
+      </SafeAreaView>
+    </InventoryProvider>
   );
 };
 
