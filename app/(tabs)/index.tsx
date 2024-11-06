@@ -1,5 +1,6 @@
 import React from "react";
 import { View, Text, SafeAreaView, StyleSheet, ScrollView } from "react-native";
+import Animated, { FadeInDown, FadeInRight } from 'react-native-reanimated';
 import Nav from "../../components/Nav";
 import QuickAction from "../../components/QuickAction";
 import MiniList from "../../components/MiniList";
@@ -12,22 +13,31 @@ const Main = () => {
         <Nav />
         <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
           {/* Modern Header Section */}
-          <View style={styles.header}>
+          <Animated.View 
+            entering={FadeInDown.duration(600).springify()}
+            style={styles.header}
+          >
             <View style={styles.headerContent}>
               <Text style={styles.greeting}>Hello, Michael</Text>
               <Text style={styles.date}>Tue, 3 Aug</Text>
             </View>
-          </View>
+          </Animated.View>
 
           {/* Quick Actions Section */}
-          <View style={styles.section}>
+          <Animated.View 
+            entering={FadeInRight.delay(200).duration(600).springify()}
+            style={styles.section}
+          >
             <QuickAction />
-          </View>
+          </Animated.View>
 
           {/* Products List Section */}
-          <View style={styles.section}>
+          <Animated.View 
+            entering={FadeInRight.delay(400).duration(600).springify()}
+            style={styles.section}
+          >
             <MiniList />
-          </View>
+          </Animated.View>
         </ScrollView>
       </SafeAreaView>
     </InventoryProvider>
