@@ -34,6 +34,10 @@ const QuickAction = () => {
     router.push('/sales');
   };
 
+  const handleExpensesPress = () => {
+    router.push('expenses');
+  };
+
   return (
     <View>
       {/* Top Cards */}
@@ -73,9 +77,12 @@ const QuickAction = () => {
           <View style={[styles.actionButton, { marginHorizontal: 8 }]}>
             <Text style={styles.buttonText}>This Week</Text>
           </View>
-          <View style={styles.actionButton}>
-            <Text style={styles.buttonText}>This Month</Text>
-          </View>
+          <TouchableOpacity 
+            style={styles.actionButton}
+            onPress={handleExpensesPress}
+          >
+            <Text style={styles.buttonText}>Expenses</Text>
+          </TouchableOpacity>
         </View>
         <TouchableOpacity
           style={[styles.actionButton, styles.customButton]}
@@ -91,8 +98,8 @@ const QuickAction = () => {
 const styles = StyleSheet.create({
   cardsContainer: {
     flexDirection: "row",
-    paddingHorizontal: 16,
-    marginTop: 42,
+    paddingHorizontal: 24,
+    marginTop: 0,
   },
   actionItem: {
     flex: 1,
@@ -142,10 +149,10 @@ const styles = StyleSheet.create({
   },
   buttonsContainer: {
     paddingHorizontal: 24,
-    marginTop: 46,
+    marginTop: 24,
     gap: 12,
-    width: '80%',
-    alignSelf: 'center', 
+    width: '100%',
+    alignSelf: 'center',
   },
   topButtons: {
     flexDirection: 'row',
@@ -157,6 +164,8 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     borderRadius: 6,
     backgroundColor: '#f3f4f6',
+    minWidth: 80,
+    alignItems: 'center',
   },
   activeButton: {
     backgroundColor: '#000',

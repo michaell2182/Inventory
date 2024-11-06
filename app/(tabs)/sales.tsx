@@ -89,76 +89,85 @@ const SalesScreen = () => {
 
   return (
     <InventoryProvider>
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView style={styles.safeArea}>
         <Nav />
-        <ScrollView>
-          {/* Header Section */}
+        <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+          {/* Modern Header Section */}
           <View style={styles.header}>
-            <Text style={styles.headerTitle}>Sales Report</Text>
-            <View style={styles.totalSalesContainer}>
-              <Text style={styles.totalSalesLabel}>Total Sales</Text>
-              <Text style={styles.totalSalesAmount}>${metrics.totalSales.toFixed(0)}</Text>
-              <Text style={styles.periodLabel}>Last 30 Days <Text style={styles.positiveChange}>+12%</Text></Text>
+            <View style={styles.headerTop}>
+              <Text style={styles.headerTitle}>Sales</Text>
+              <TouchableOpacity 
+                style={styles.addSaleButton}
+                onPress={() => setShowSaleModal(true)}
+              >
+                <Text style={styles.addSaleButtonText}>+ Add Sale</Text>
+              </TouchableOpacity>
             </View>
-
-            {/* Chart */}
-            <LineChart
-              data={chartData}
-              width={Dimensions.get('window').width - 32}
-              height={200}
-              chartConfig={{
-                backgroundColor: '#fff',
-                backgroundGradientFrom: '#fff',
-                backgroundGradientTo: '#fff',
-                decimalPlaces: 0,
-                color: (opacity = 1) => `rgba(0, 122, 255, ${opacity})`,
-                style: {
-                  borderRadius: 16,
-                },
-              }}
-              bezier
-              style={styles.chart}
-              withDots={false}
-              withVerticalLines={false}
-              withHorizontalLines={false}
-            />
+            
+            {/* Revenue Card */}
+            <View style={styles.revenueCard}>
+              <Text style={styles.revenueLabel}>Total Revenue</Text>
+              <View style={styles.revenueRow}>
+                <Text style={styles.revenueAmount}>${metrics.totalSales.toLocaleString()}</Text>
+                <LineChart
+                  data={{
+                    datasets: [{
+                      data: [5000, 6000, 5500, 7000, 6500, 8000, 7500]
+                    }]
+                  }}
+                  width={100}
+                  height={40}
+                  withDots={false}
+                  withInnerLines={false}
+                  withOuterLines={false}
+                  withVerticalLabels={false}
+                  withHorizontalLabels={false}
+                  chartConfig={{
+                    backgroundGradientFrom: '#f8f9fa',
+                    backgroundGradientTo: '#f8f9fa',
+                    color: (opacity = 1) => `rgba(0, 122, 255, ${opacity})`,
+                    strokeWidth: 2,
+                  }}
+                  bezier
+                  style={styles.miniChart}
+                />
+              </View>
+              <View style={styles.periodContainer}>
+                <Text style={styles.periodLabel}>vs. last month</Text>
+                <View style={styles.changeIndicator}>
+                  <Text style={styles.positiveChange}>+12%</Text>
+                </View>
+              </View>
+            </View>
           </View>
 
-          {/* Metrics Grid */}
-          <View style={styles.metricsGrid}>
-            <View style={styles.metricRow}>
+          {/* Modern 2x2 Metrics Grid */}
+          <View style={styles.metricsContainer}>
+            <View style={styles.metricsRow}>
               <View style={styles.metricCard}>
+                <Text style={styles.metricValue}>${metrics.totalSales.toLocaleString()}</Text>
                 <Text style={styles.metricTitle}>Total Sales</Text>
-                <Text style={styles.metricValue}>${metrics.totalSales.toFixed(0)}</Text>
-                <Text style={styles.positiveChange}>+13%</Text>
+                <Text style={styles.metricChange}>+13%</Text>
               </View>
               <View style={styles.metricCard}>
-                <Text style={styles.metricTitle}>Average Sales</Text>
-                <Text style={styles.metricValue}>${metrics.averageSale.toFixed(0)}</Text>
-                <Text style={styles.positiveChange}>+16%</Text>
+                <Text style={styles.metricValue}>${metrics.averageSale.toLocaleString()}</Text>
+                <Text style={styles.metricTitle}>Average Sale</Text>
+                <Text style={styles.metricChange}>+16%</Text>
               </View>
             </View>
-            <View style={styles.metricRow}>
+            <View style={styles.metricsRow}>
               <View style={styles.metricCard}>
-                <Text style={styles.metricTitle}>Total Items Sold</Text>
                 <Text style={styles.metricValue}>{metrics.totalItemsSold}</Text>
-                <Text style={styles.positiveChange}>+14%</Text>
+                <Text style={styles.metricTitle}>Items Sold</Text>
+                <Text style={styles.metricChange}>+14%</Text>
               </View>
               <View style={styles.metricCard}>
-                <Text style={styles.metricTitle}>Average Items Sold</Text>
                 <Text style={styles.metricValue}>{metrics.averageItemsPerSale.toFixed(1)}</Text>
-                <Text style={styles.positiveChange}>+15%</Text>
+                <Text style={styles.metricTitle}>Avg Items/Sale</Text>
+                <Text style={styles.metricChange}>+15%</Text>
               </View>
             </View>
           </View>
-
-          {/* Add this button before or after your metrics grid */}
-          <TouchableOpacity 
-            style={styles.addSaleButton}
-            onPress={() => setShowSaleModal(true)}
-          >
-            <Text style={styles.addSaleButtonText}>Record New Sale</Text>
-          </TouchableOpacity>
 
           {/* Items Sold List */}
           <View style={styles.salesContainer}>
@@ -176,81 +185,121 @@ const SalesScreen = () => {
             ))}
           </View>
         </ScrollView>
-
-        <AddSaleModal
-          visible={showSaleModal}
-          onClose={() => setShowSaleModal(false)}
-          onSaleComplete={handleSaleComplete}
-        />
       </SafeAreaView>
+
+      <AddSaleModal
+        visible={showSaleModal}
+        onClose={() => setShowSaleModal(false)}
+        onSaleComplete={handleSaleComplete}
+      />
     </InventoryProvider>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
+  safeArea: {
     flex: 1,
     backgroundColor: '#fff',
   },
+  scrollView: {
+    flex: 1,
+  },
   header: {
-    padding: 16,
-    backgroundColor: '#fff',
+    padding: 24,
   },
-  headerTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-    marginBottom: 16,
-  },
-  totalSalesContainer: {
+  headerTop: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     marginBottom: 24,
   },
-  totalSalesLabel: {
-    fontSize: 16,
-    color: '#666',
-    marginBottom: 4,
-  },
-  totalSalesAmount: {
+  headerTitle: {
     fontSize: 32,
     fontWeight: '700',
-    marginBottom: 4,
+    color: '#1a1a1a',
+  },
+  addSaleButton: {
+    backgroundColor: 'black',
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    borderRadius: 25,
+    shadowColor: '#007AFF',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  addSaleButtonText: {
+    color: '#fff',
+    fontSize: 15,
+    fontWeight: '600',
+  },
+  revenueCard: {
+    backgroundColor: '#f8f9fa',
+    padding: 24,
+    borderRadius: 20,
+    marginBottom: 24,
+  },
+  revenueLabel: {
+    fontSize: 15,
+    color: '#666',
+    marginBottom: 8,
+    fontWeight: '500',
+  },
+  revenueAmount: {
+    fontSize: 42,
+    fontWeight: '700',
+    color: '#1a1a1a',
+    marginBottom: 12,
+  },
+  periodContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   periodLabel: {
     fontSize: 14,
     color: '#666',
   },
-  chart: {
-    marginVertical: 16,
-    borderRadius: 16,
+  changeIndicator: {
+    marginLeft: 8,
   },
-  metricsGrid: {
-    padding: 16,
-    gap: 16,
+  positiveChange: {
+    color: '#34C759',
+    fontSize: 14,
+    fontWeight: '600',
   },
-  metricRow: {
+  metricsContainer: {
+    padding: 12,
+    gap: 12,
+  },
+  metricsRow: {
     flexDirection: 'row',
-    gap: 16,
+    gap: 12,
   },
   metricCard: {
     flex: 1,
     backgroundColor: '#fff',
-    padding: 16,
-    borderRadius: 12,
+    padding: 20,
+    borderRadius: 16,
     borderWidth: 1,
-    borderColor: '#eee',
+    borderColor: '#f0f0f0',
+  },
+  metricValue: {
+    fontSize: 24,
+    fontWeight: '700',
+    color: '#1a1a1a',
+    marginBottom: 8,
   },
   metricTitle: {
     fontSize: 14,
     color: '#666',
     marginBottom: 8,
+    fontWeight: '500',
   },
-  metricValue: {
-    fontSize: 20,
-    fontWeight: '600',
-    marginBottom: 4,
-  },
-  positiveChange: {
-    color: '#22c55e',
+  metricChange: {
+    color: '#34C759',
     fontSize: 14,
+    fontWeight: '600',
   },
   salesContainer: {
     padding: 16,
@@ -283,17 +332,15 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
   },
-  addSaleButton: {
-    backgroundColor: '#000',
-    margin: 16,
-    padding: 16,
-    borderRadius: 12,
+  revenueRow: {
+    flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 12,
   },
-  addSaleButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
+  miniChart: {
+    paddingRight: -16,
+    marginRight: -16,
   },
 });
 

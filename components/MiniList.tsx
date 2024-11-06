@@ -78,15 +78,14 @@ const MiniList = () => {
 
 const styles = StyleSheet.create({
   wrapper: {
-    marginTop: 62,
+    marginTop: 0,
     paddingHorizontal: 0,
     flex: 1,
   },
   container: {
     backgroundColor: '#fff',
-    borderRadius: 24,
     flex: 1,
-    marginHorizontal: 16,
+    marginHorizontal: 24,
   },
   listContent: {
     padding: 8,
@@ -150,7 +149,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 24,
-    marginBottom: 12,
+    marginBottom: 16,
   },
   addButton: {
     backgroundColor: '#000',
