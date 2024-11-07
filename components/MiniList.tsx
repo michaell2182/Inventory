@@ -1,8 +1,9 @@
 import React from "react";
-import { View, Text, StyleSheet, FlatList, Image, TouchableOpacity } from "react-native";
+import { View, Text, StyleSheet, FlatList, Image, TouchableOpacity, ActivityIndicator } from "react-native";
 import { useInventory } from '../store/InventoryContext';
 import { Product } from '../types/inventory';
 // import { useInventoryActions } from '../hooks/useInventoryActions';
+import { Ionicons } from '@expo/vector-icons';
 
 const ListItem = ({ item, onPress }: { item: Product; onPress: () => void }) => (
   <TouchableOpacity onPress={onPress} style={styles.listItem}>
@@ -27,11 +28,24 @@ const ListHeader = () => (
   <View style={styles.headerLine} />
 );
 
+const EmptyState = () => (
+  <View style={styles.emptyStateContainer}>
+    <View style={styles.emptyStateContent}>
+      <View style={styles.iconContainer}>
+        <Ionicons name="cube-outline" size={32} color="#666" />
+      </View>
+      <Text style={styles.emptyStateTitle}>No Products Yet</Text>
+      <Text style={styles.emptyStateText}>
+        Your inventory list is empty. Add your first product to get started.
+      </Text>
+    </View>
+  </View>
+);
+
 const MiniList = () => {
   const { state } = useInventory();
   const { products, isLoading, error } = state;
 
-  // Limit products to first 5
   const limitedProducts = products.slice(0, 5);
 
   if (isLoading) {
@@ -48,21 +62,25 @@ const MiniList = () => {
         <Text style={styles.sectionTitle}>Products</Text>
       </View>
       <View style={styles.container}>
-        <FlatList
-          data={limitedProducts}
-          renderItem={({ item }) => (
-            <ListItem 
-              item={item} 
-              onPress={() => {}}
-            />
-          )}
-          keyExtractor={(item) => item.id}
-          ListHeaderComponent={ListHeader}
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={styles.listContent}
-          bounces={true}
-          overScrollMode="never"
-        />
+        {products.length === 0 ? (
+          <EmptyState />
+        ) : (
+          <FlatList
+            data={limitedProducts}
+            renderItem={({ item }) => (
+              <ListItem 
+                item={item} 
+                onPress={() => {}}
+              />
+            )}
+            keyExtractor={(item) => item.id}
+            ListHeaderComponent={ListHeader}
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={styles.listContent}
+            bounces={true}
+            overScrollMode="never"
+          />
+        )}
       </View>
     </View>
   );
@@ -153,6 +171,37 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 14,
     fontWeight: '500',
+  },
+  emptyStateContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 40,
+  },
+  emptyStateContent: {
+    alignItems: 'center',
+    padding: 24,
+  },
+  iconContainer: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: '#f3f4f6',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 16,
+  },
+  emptyStateTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#374151',
+    marginBottom: 8,
+  },
+  emptyStateText: {
+    fontSize: 14,
+    color: '#6b7280',
+    textAlign: 'center',
+    lineHeight: 20,
   },
 });
 

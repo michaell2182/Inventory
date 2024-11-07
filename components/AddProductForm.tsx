@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, TextInput, TouchableOpacity, Text, StyleSheet, Image, Modal, ScrollView } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
-import { useInventoryActions } from '../hooks/useInventoryActions';
+import { useInventory } from '../store/InventoryContext';
 
 const CATEGORIES = [
   'Electronics',
@@ -22,7 +22,7 @@ interface AddProductFormProps {
 }
 
 const AddProductForm = ({ visible, onClose, imageUri }: AddProductFormProps) => {
-  const { addProduct } = useInventoryActions();
+  const { addProduct } = useInventory();
   const [title, setTitle] = useState('');
   const [price, setPrice] = useState('');
   const [quantity, setQuantity] = useState('');

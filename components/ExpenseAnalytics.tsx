@@ -8,6 +8,7 @@ import {
 } from 'react-native';
 import { LineChart, BarChart } from 'react-native-chart-kit';
 import { supabase } from '../lib/supabase';
+import EmptyState from './EmptyState';
 
 interface AnalyticsData {
   trendData: {
@@ -26,6 +27,7 @@ interface AnalyticsData {
 
 const ExpenseAnalytics = () => {
   const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const screenWidth = Dimensions.get('window').width;
 
   const chartConfig = {
@@ -37,6 +39,9 @@ const ExpenseAnalytics = () => {
     style: {
       borderRadius: 16,
     },
+    propsForLabels: {
+      fontSize: 10, // Smaller font size for labels
+    },
   };
 
   useEffect(() => {
@@ -45,7 +50,7 @@ const ExpenseAnalytics = () => {
 
   const fetchAnalytics = async () => {
     try {
-      // Fetch last 30 days of expenses
+      setIsLoading(true);
       const thirtyDaysAgo = new Date();
       thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
@@ -56,74 +61,116 @@ const ExpenseAnalytics = () => {
         .order('date');
 
       if (error) throw error;
+      if (!expenses || expenses.length === 0) {
+        setAnalytics(null);
+        return;
+      }
 
-      // Process data for charts
-      const dailyTotals = expenses.reduce((acc: Record<string, number>, expense) => {
+      // Process data for charts - only show last 7 days
+      const dailyTotals: Record<string, number> = {};
+      const last7Days = [...Array(7)].map((_, i) => {
+        const date = new Date();
+        date.setDate(date.getDate() - i);
+        return date.toLocaleDateString();
+      }).reverse();
+
+      // Initialize all dates with 0
+      last7Days.forEach(date => {
+        dailyTotals[date] = 0;
+      });
+
+      // Add actual expenses
+      expenses.forEach(expense => {
         const date = new Date(expense.date).toLocaleDateString();
-        acc[date] = (acc[date] || 0) + expense.amount;
-        return acc;
-      }, {});
+        if (dailyTotals[date] !== undefined) {
+          dailyTotals[date] += expense.amount;
+        }
+      });
 
-      const dates = Object.keys(dailyTotals).slice(-7); // Last 7 days
-      const amounts = dates.map(date => dailyTotals[date]);
-
-      // Calculate analytics
+      const dates = Object.keys(dailyTotals);
+      const amounts = Object.values(dailyTotals);
       const totalSpent = amounts.reduce((sum, amount) => sum + amount, 0);
       const averageDaily = totalSpent / amounts.length;
 
       setAnalytics({
         trendData: {
-          dates,
+          dates: dates.map(date => date.split('/').slice(0, 2).join('/')), // Shorter date format
           amounts,
         },
-        yearOverYear: 0, // Calculate if you have historical data
+        yearOverYear: 0,
         averageDaily,
         projectedMonthly: averageDaily * 30,
-        topCategories: [], // Add category calculations
+        topCategories: [],
       });
     } catch (error) {
       console.error('Error fetching analytics:', error);
+      setAnalytics(null);
+    } finally {
+      setIsLoading(false);
     }
   };
 
+  if (isLoading) {
+    return (
+      <View style={styles.container}>
+        <EmptyState
+          icon="bar-chart-outline"
+          title="Loading analytics..."
+          message="Please wait while we crunch the numbers"
+        />
+      </View>
+    );
+  }
+
+  if (!analytics) {
+    return (
+      <View style={styles.container}>
+        <EmptyState
+          icon="bar-chart-outline"
+          title="No Data Available"
+          message="Add some expenses to see your analytics"
+        />
+      </View>
+    );
+  }
+
   return (
     <ScrollView style={styles.container}>
-      {analytics && (
-        <>
-          <View style={styles.card}>
-            <Text style={styles.cardTitle}>Spending Trend</Text>
-            <LineChart
-              data={{
-                labels: analytics.trendData.dates,
-                datasets: [{
-                  data: analytics.trendData.amounts
-                }]
-              }}
-              width={screenWidth - 32}
-              height={220}
-              chartConfig={chartConfig}
-              bezier
-              style={styles.chart}
-            />
-          </View>
+      <View style={styles.card}>
+        <Text style={styles.cardTitle}>Spending Trend</Text>
+        <LineChart
+          data={{
+            labels: analytics.trendData.dates,
+            datasets: [{
+              data: analytics.trendData.amounts.length > 0 
+                ? analytics.trendData.amounts 
+                : [0], // Fallback if no data
+            }]
+          }}
+          width={screenWidth - 32}
+          height={220}
+          chartConfig={chartConfig}
+          bezier
+          style={styles.chart}
+          withVerticalLabels={true}
+          withHorizontalLabels={true}
+        />
+      </View>
 
-          <View style={styles.insightsContainer}>
-            <View style={styles.insightCard}>
-              <Text style={styles.insightLabel}>Daily Average</Text>
-              <Text style={styles.insightValue}>
-                ${analytics.averageDaily.toFixed(2)}
-              </Text>
-            </View>
-            <View style={styles.insightCard}>
-              <Text style={styles.insightLabel}>Year over Year</Text>
-              <Text style={styles.insightValue}>
-                {analytics.yearOverYear > 0 ? '+' : ''}
-                {analytics.yearOverYear}%
-              </Text>
-            </View>
-          </View>
-        </>
-      )}
+      <View style={styles.insightsContainer}>
+        <View style={styles.insightCard}>
+          <Text style={styles.insightLabel}>Daily Average</Text>
+          <Text style={styles.insightValue}>
+            ${analytics.averageDaily.toFixed(2)}
+          </Text>
+        </View>
+        <View style={styles.insightCard}>
+          <Text style={styles.insightLabel}>Monthly Projected</Text>
+          <Text style={styles.insightValue}>
+            ${analytics.projectedMonthly.toFixed(2)}
+          </Text>
+        </View>
+      </View>
     </ScrollView>
   );
 };

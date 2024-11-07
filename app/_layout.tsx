@@ -1,5 +1,6 @@
 import { Stack } from 'expo-router';
 import { AuthProvider, useAuth } from '../store/AuthContext';
+import { InventoryProvider } from '../store/InventoryContext';
 import { useRouter, useSegments } from 'expo-router';
 import { useEffect } from 'react';
 import { View, ActivityIndicator } from 'react-native';
@@ -35,9 +36,11 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 export default function RootLayout() {
   return (
     <AuthProvider>
-      <ProtectedRoute>
-        <Stack screenOptions={{ headerShown: false }} />
-      </ProtectedRoute>
+      <InventoryProvider>
+        <ProtectedRoute>
+          <Stack screenOptions={{ headerShown: false }} />
+        </ProtectedRoute>
+      </InventoryProvider>
     </AuthProvider>
   );
 } 

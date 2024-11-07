@@ -22,6 +22,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import BudgetManager from '../../components/BudgetManager';
 import ExpenseAnalytics from '../../components/ExpenseAnalytics';
 import ExpenseReport from '../../components/ExpenseReport';
+import EmptyState from '../../components/EmptyState';
 
 interface ExpenseCategory {
   name: string;
@@ -363,11 +364,11 @@ const ExpenseScreen = () => {
                   </View>
                 ))
               ) : (
-                <View style={styles.emptyCategory}>
-                  <Text style={styles.emptyCategoryText}>
-                    No expenses yet. Tap + to add one!
-                  </Text>
-                </View>
+                <EmptyState
+                  icon="pie-chart-outline"
+                  title="No Categories Yet"
+                  message="Add expenses to see your spending breakdown by category"
+                />
               )}
             </ScrollView>
           </View>

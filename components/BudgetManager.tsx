@@ -10,6 +10,7 @@ import {
 import { supabase } from '../lib/supabase';
 import { Ionicons } from '@expo/vector-icons';
 import AddBudgetModal from './AddBudgetModal';
+import EmptyState from './EmptyState';
 
 interface Budget {
   id: string;
@@ -100,11 +101,11 @@ const BudgetManager = () => {
         })}
         
         {budgets.length === 0 && !isLoading && (
-          <View style={styles.emptyState}>
-            <Text style={styles.emptyStateText}>
-              No budgets yet. Tap + to add one!
-            </Text>
-          </View>
+          <EmptyState
+            icon="wallet-outline"
+            title="No Budgets Set"
+            message="Start managing your spending by setting up your first budget"
+          />
         )}
       </ScrollView>
 

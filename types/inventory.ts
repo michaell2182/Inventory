@@ -1,5 +1,6 @@
-export interface Product {
+export type Product = {
     id: string;
+    user_id: string;
     title: string;
     price: number;
     quantity: number;
@@ -8,7 +9,7 @@ export interface Product {
     sku?: string;
     reorder_point?: number;
     created_at?: string;
-}
+};
 
 export interface InventoryState {
     products: Product[];

@@ -6,6 +6,7 @@ import { Dimensions } from 'react-native';
 import AddSaleModal from '../../components/AddSaleModal';
 import { InventoryProvider } from '../../store/InventoryContext';
 import Nav from '../../components/Nav';
+import EmptyState from '../../components/EmptyState';
 
 interface SalesMetrics {
   totalSales: number;
@@ -172,17 +173,25 @@ const SalesScreen = () => {
           {/* Items Sold List */}
           <View style={styles.salesContainer}>
             <Text style={styles.sectionTitle}>Items Sold</Text>
-            {recentSales.map((sale) => (
-              <View key={sale.id} style={styles.saleItem}>
-                <View style={styles.saleHeader}>
-                  <View>
-                    <Text style={styles.productTitle}>{sale.product.title}</Text>
-                    <Text style={styles.soldText}>Sold: {sale.quantity_sold}</Text>
+            {recentSales.length === 0 ? (
+              <EmptyState
+                icon="cart-outline"
+                title="No Sales Yet"
+                message="Record your first sale to start tracking your revenue"
+              />
+            ) : (
+              recentSales.map((sale) => (
+                <View key={sale.id} style={styles.saleItem}>
+                  <View style={styles.saleHeader}>
+                    <View>
+                      <Text style={styles.productTitle}>{sale.product.title}</Text>
+                      <Text style={styles.soldText}>Sold: {sale.quantity_sold}</Text>
+                    </View>
+                    <Text style={styles.salePrice}>${sale.sale_price.toFixed(0)}</Text>
                   </View>
-                  <Text style={styles.salePrice}>${sale.sale_price.toFixed(0)}</Text>
                 </View>
-              </View>
-            ))}
+              ))
+            )}
           </View>
         </ScrollView>
       </SafeAreaView>

@@ -52,7 +52,7 @@ const QuickAction = () => {
               <UpTrendIcon />
             </View>
           </View>
-          <Text style={styles.amount}>$296,913.00</Text>
+          <Text style={styles.amount}>$0</Text>
         </View>
         <View style={styles.actionItem}>
           <View style={styles.topContainer}>
@@ -64,7 +64,7 @@ const QuickAction = () => {
               <DownTrendIcon />
             </View>
           </View>
-          <Text style={styles.amount}>$9,981.00</Text>
+          <Text style={styles.amount}>$0</Text>
         </View>
       </View>
 
