@@ -23,6 +23,7 @@ import BudgetManager from '../../components/BudgetManager';
 import ExpenseAnalytics from '../../components/ExpenseAnalytics';
 import ExpenseReport from '../../components/ExpenseReport';
 import EmptyState from '../../components/EmptyState';
+import { useNavigation } from '@react-navigation/native';
 
 interface ExpenseCategory {
   name: string;
@@ -105,10 +106,17 @@ const ExpenseScreen = () => {
   });
   const [showDatePicker, setShowDatePicker] = useState<'start' | 'end' | null>(null);
   const [activeTab, setActiveTab] = useState<'expenses' | 'budget' | 'analytics' | 'reports'>('expenses');
+  const navigation = useNavigation();
 
   useEffect(() => {
     fetchExpenses();
   }, []);
+
+  useEffect(() => {
+    navigation.setOptions({
+      gestureEnabled: true,
+    });
+  }, [navigation]);
 
   const fetchExpenses = useCallback(async () => {
     try {

@@ -7,6 +7,7 @@ import AddSaleModal from '../../components/AddSaleModal';
 import { InventoryProvider } from '../../store/InventoryContext';
 import Nav from '../../components/Nav';
 import EmptyState from '../../components/EmptyState';
+import { useNavigation } from '@react-navigation/native';
 
 interface SalesMetrics {
   totalSales: number;
@@ -37,10 +38,17 @@ const SalesScreen = () => {
   const [recentSales, setRecentSales] = useState<SaleRecord[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [showSaleModal, setShowSaleModal] = useState(false);
+  const navigation = useNavigation();
 
   useEffect(() => {
     fetchSalesData();
   }, []);
+
+  useEffect(() => {
+    navigation.setOptions({
+      gestureEnabled: true,
+    });
+  }, [navigation]);
 
   const fetchSalesData = async () => {
     try {
