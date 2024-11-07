@@ -97,119 +97,117 @@ const SalesScreen = () => {
   };
 
   return (
-    <InventoryProvider>
-      <SafeAreaView style={styles.safeArea}>
-        <Nav />
-        <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
-          {/* Modern Header Section */}
-          <View style={styles.header}>
-            <View style={styles.headerTop}>
-              <Text style={styles.headerTitle}>Sales</Text>
-              <TouchableOpacity 
-                style={styles.addSaleButton}
-                onPress={() => setShowSaleModal(true)}
-              >
-                <Text style={styles.addSaleButtonText}>+ Add Sale</Text>
-              </TouchableOpacity>
-            </View>
-            
-            {/* Revenue Card */}
-            <View style={styles.revenueCard}>
-              <Text style={styles.revenueLabel}>Total Revenue</Text>
-              <View style={styles.revenueRow}>
-                <Text style={styles.revenueAmount}>${metrics.totalSales.toLocaleString()}</Text>
-                <LineChart
-                  data={{
-                    datasets: [{
-                      data: [5000, 6000, 5500, 7000, 6500, 8000, 7500]
-                    }]
-                  }}
-                  width={100}
-                  height={40}
-                  withDots={false}
-                  withInnerLines={false}
-                  withOuterLines={false}
-                  withVerticalLabels={false}
-                  withHorizontalLabels={false}
-                  chartConfig={{
-                    backgroundGradientFrom: '#f8f9fa',
-                    backgroundGradientTo: '#f8f9fa',
-                    color: (opacity = 1) => `rgba(0, 122, 255, ${opacity})`,
-                    strokeWidth: 2,
-                  }}
-                  bezier
-                  style={styles.miniChart}
-                />
-              </View>
-              <View style={styles.periodContainer}>
-                <Text style={styles.periodLabel}>vs. last month</Text>
-                <View style={styles.changeIndicator}>
-                  <Text style={styles.positiveChange}>+12%</Text>
-                </View>
-              </View>
-            </View>
+    <SafeAreaView style={styles.safeArea}>
+      <Nav />
+      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+        {/* Modern Header Section */}
+        <View style={styles.header}>
+          <View style={styles.headerTop}>
+            <Text style={styles.headerTitle}>Sales</Text>
+            <TouchableOpacity 
+              style={styles.addSaleButton}
+              onPress={() => setShowSaleModal(true)}
+            >
+              <Text style={styles.addSaleButtonText}>+ Add Sale</Text>
+            </TouchableOpacity>
           </View>
-
-          {/* Modern 2x2 Metrics Grid */}
-          <View style={styles.metricsContainer}>
-            <View style={styles.metricsRow}>
-              <View style={styles.metricCard}>
-                <Text style={styles.metricValue}>${metrics.totalSales.toLocaleString()}</Text>
-                <Text style={styles.metricTitle}>Total Sales</Text>
-                <Text style={styles.metricChange}>+13%</Text>
-              </View>
-              <View style={styles.metricCard}>
-                <Text style={styles.metricValue}>${metrics.averageSale.toLocaleString()}</Text>
-                <Text style={styles.metricTitle}>Average Sale</Text>
-                <Text style={styles.metricChange}>+16%</Text>
-              </View>
-            </View>
-            <View style={styles.metricsRow}>
-              <View style={styles.metricCard}>
-                <Text style={styles.metricValue}>{metrics.totalItemsSold}</Text>
-                <Text style={styles.metricTitle}>Items Sold</Text>
-                <Text style={styles.metricChange}>+14%</Text>
-              </View>
-              <View style={styles.metricCard}>
-                <Text style={styles.metricValue}>{metrics.averageItemsPerSale.toFixed(1)}</Text>
-                <Text style={styles.metricTitle}>Avg Items/Sale</Text>
-                <Text style={styles.metricChange}>+15%</Text>
-              </View>
-            </View>
-          </View>
-
-          {/* Items Sold List */}
-          <View style={styles.salesContainer}>
-            <Text style={styles.sectionTitle}>Items Sold</Text>
-            {recentSales.length === 0 ? (
-              <EmptyState
-                icon="cart-outline"
-                title="No Sales Yet"
-                message="Record your first sale to start tracking your revenue"
+          
+          {/* Revenue Card */}
+          <View style={styles.revenueCard}>
+            <Text style={styles.revenueLabel}>Total Revenue</Text>
+            <View style={styles.revenueRow}>
+              <Text style={styles.revenueAmount}>${metrics.totalSales.toLocaleString()}</Text>
+              <LineChart
+                data={{
+                  datasets: [{
+                    data: [5000, 6000, 5500, 7000, 6500, 8000, 7500]
+                  }]
+                }}
+                width={100}
+                height={40}
+                withDots={false}
+                withInnerLines={false}
+                withOuterLines={false}
+                withVerticalLabels={false}
+                withHorizontalLabels={false}
+                chartConfig={{
+                  backgroundGradientFrom: '#f8f9fa',
+                  backgroundGradientTo: '#f8f9fa',
+                  color: (opacity = 1) => `rgba(0, 122, 255, ${opacity})`,
+                  strokeWidth: 2,
+                }}
+                bezier
+                style={styles.miniChart}
               />
-            ) : (
-              recentSales.map((sale) => (
-                <View key={sale.id} style={styles.saleItem}>
-                  <View style={styles.saleHeader}>
-                    <View>
-                      <Text style={styles.productTitle}>{sale.product.title}</Text>
-                      <Text style={styles.soldText}>Sold: {sale.quantity_sold}</Text>
-                    </View>
-                    <Text style={styles.salePrice}>${sale.sale_price.toFixed(0)}</Text>
-                  </View>
-                </View>
-              ))
-            )}
+            </View>
+            <View style={styles.periodContainer}>
+              <Text style={styles.periodLabel}>vs. last month</Text>
+              <View style={styles.changeIndicator}>
+                <Text style={styles.positiveChange}>+12%</Text>
+              </View>
+            </View>
           </View>
-        </ScrollView>
-      </SafeAreaView>
+        </View>
+
+        {/* Modern 2x2 Metrics Grid */}
+        <View style={styles.metricsContainer}>
+          <View style={styles.metricsRow}>
+            <View style={styles.metricCard}>
+              <Text style={styles.metricValue}>${metrics.totalSales.toLocaleString()}</Text>
+              <Text style={styles.metricTitle}>Total Sales</Text>
+              <Text style={styles.metricChange}>+13%</Text>
+            </View>
+            <View style={styles.metricCard}>
+              <Text style={styles.metricValue}>${metrics.averageSale.toLocaleString()}</Text>
+              <Text style={styles.metricTitle}>Average Sale</Text>
+              <Text style={styles.metricChange}>+16%</Text>
+            </View>
+          </View>
+          <View style={styles.metricsRow}>
+            <View style={styles.metricCard}>
+              <Text style={styles.metricValue}>{metrics.totalItemsSold}</Text>
+              <Text style={styles.metricTitle}>Items Sold</Text>
+              <Text style={styles.metricChange}>+14%</Text>
+            </View>
+            <View style={styles.metricCard}>
+              <Text style={styles.metricValue}>{metrics.averageItemsPerSale.toFixed(1)}</Text>
+              <Text style={styles.metricTitle}>Avg Items/Sale</Text>
+              <Text style={styles.metricChange}>+15%</Text>
+            </View>
+          </View>
+        </View>
+
+        {/* Items Sold List */}
+        <View style={styles.salesContainer}>
+          <Text style={styles.sectionTitle}>Items Sold</Text>
+          {recentSales.length === 0 ? (
+            <EmptyState
+              icon="cart-outline"
+              title="No Sales Yet"
+              message="Record your first sale to start tracking your revenue"
+            />
+          ) : (
+            recentSales.map((sale) => (
+              <View key={sale.id} style={styles.saleItem}>
+                <View style={styles.saleHeader}>
+                  <View>
+                    <Text style={styles.productTitle}>{sale.product.title}</Text>
+                    <Text style={styles.soldText}>Sold: {sale.quantity_sold}</Text>
+                  </View>
+                  <Text style={styles.salePrice}>${sale.sale_price.toFixed(0)}</Text>
+                </View>
+              </View>
+            ))
+          )}
+        </View>
+      </ScrollView>
 
       <AddSaleModal
         visible={showSaleModal}
         onClose={() => setShowSaleModal(false)}
         onSaleComplete={handleSaleComplete}
       />
-    </InventoryProvider>
+    </SafeAreaView>
   );
 };
 
