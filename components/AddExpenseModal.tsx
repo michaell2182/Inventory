@@ -14,7 +14,15 @@ import { Ionicons } from '@expo/vector-icons';
 import { supabase } from '../lib/supabase';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import * as Haptics from 'expo-haptics';
-import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
+import Animated, { 
+  FadeIn, 
+  FadeOut, 
+  SlideInDown, 
+  SlideOutDown,
+  withSpring,
+  useAnimatedStyle,
+  withTiming
+} from 'react-native-reanimated';
 
 const EXPENSE_CATEGORIES = [
   'Supplies',
@@ -32,6 +40,14 @@ interface AddExpenseModalProps {
   onExpenseAdded: () => void;
 }
 
+interface Budget {
+  category: string;
+  limit: number;
+  spent: number;
+  period: 'weekly' | 'monthly' | 'yearly';
+  notifications: boolean;
+}
+
 const AddExpenseModal = ({ visible, onClose, onExpenseAdded }: AddExpenseModalProps) => {
   const [description, setDescription] = useState('');
   const [amount, setAmount] = useState('');
@@ -41,15 +57,30 @@ const AddExpenseModal = ({ visible, onClose, onExpenseAdded }: AddExpenseModalPr
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
+  const AnimatedTouchableOpacity = Animated.createAnimatedComponent(TouchableOpacity);
+
   const handleSubmit = async () => {
+    console.log('Submit pressed with values:', {
+      description,
+      amount,
+      category,
+      date,
+      notes
+    });
+
     if (!description || !amount || !category) {
+      console.log('Missing required fields:', {
+        hasDescription: !!description,
+        hasAmount: !!amount,
+        hasCategory: !!category
+      });
       alert('Please fill in all required fields');
       return;
     }
 
     setIsLoading(true);
     try {
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('expenses')
         .insert({
           description,
@@ -57,7 +88,11 @@ const AddExpenseModal = ({ visible, onClose, onExpenseAdded }: AddExpenseModalPr
           category,
           date: date.toISOString(),
           notes,
-        });
+        })
+        .select()
+        .single();
+
+      console.log('Supabase response:', { data, error });
 
       if (error) throw error;
 
@@ -81,12 +116,17 @@ const AddExpenseModal = ({ visible, onClose, onExpenseAdded }: AddExpenseModalPr
   };
 
   return (
-    <Modal visible={visible} animationType="slide" transparent>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
+    <Modal visible={visible} animationType="none" transparent>
+      <Animated.View 
+        entering={FadeIn}
+        exiting={FadeOut}
         style={styles.container}
       >
-        <View style={styles.content}>
+        <Animated.View
+          entering={SlideInDown}
+          exiting={SlideOutDown}
+          style={styles.content}
+        >
           <View style={styles.header}>
             <Text style={styles.title}>Add Expense</Text>
             <TouchableOpacity onPress={onClose}>
@@ -94,7 +134,11 @@ const AddExpenseModal = ({ visible, onClose, onExpenseAdded }: AddExpenseModalPr
             </TouchableOpacity>
           </View>
 
-          <ScrollView style={styles.form}>
+          <ScrollView 
+            style={styles.form}
+            contentContainerStyle={{ paddingBottom: 20 }}
+            showsVerticalScrollIndicator={true}
+          >
             <Text style={styles.label}>Description *</Text>
             <TextInput
               style={styles.input}
@@ -167,7 +211,7 @@ const AddExpenseModal = ({ visible, onClose, onExpenseAdded }: AddExpenseModalPr
               </Text>
             </TouchableOpacity>
           </View>
-        </View>
+        </Animated.View>
 
         {showDatePicker && (
           <DateTimePicker
@@ -182,7 +226,7 @@ const AddExpenseModal = ({ visible, onClose, onExpenseAdded }: AddExpenseModalPr
             }}
           />
         )}
-      </KeyboardAvoidingView>
+      </Animated.View>
     </Modal>
   );
 };
@@ -199,6 +243,7 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 20,
     padding: 20,
     maxHeight: '90%',
+    minHeight: '50%',
   },
   header: {
     flexDirection: 'row',
@@ -212,6 +257,7 @@ const styles = StyleSheet.create({
   },
   form: {
     flex: 1,
+    marginBottom: 20,
   },
   label: {
     fontSize: 16,
