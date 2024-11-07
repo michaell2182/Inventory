@@ -1,15 +1,18 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, TouchableOpacity, Text } from 'react-native';
+import { View, StyleSheet, TouchableOpacity, Text, Modal, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import ImagePickerModal from './ImagePickerModal';
 import AddProductForm from './AddProductForm';
+import { useAuth } from '../store/AuthContext';
 
 const Nav = () => {
+  const { signOut } = useAuth();
   const [imagePickerVisible, setImagePickerVisible] = useState(false);
   const [formVisible, setFormVisible] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [showProfileMenu, setShowProfileMenu] = useState(false);
 
   const handleCameraPress = () => {
     setImagePickerVisible(true);
@@ -59,10 +62,40 @@ const Nav = () => {
     }
   };
 
+  const handleSignOut = async () => {
+    Alert.alert(
+      "Sign Out",
+      "Are you sure you want to sign out?",
+      [
+        {
+          text: "Cancel",
+          style: "cancel"
+        },
+        {
+          text: "Sign Out",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              await signOut();
+              setShowProfileMenu(false);
+            } catch (error) {
+              Alert.alert('Error', 'Failed to sign out');
+            }
+          }
+        }
+      ]
+    );
+  };
+
   return (
     <View style={styles.navContainer}>
       <View style={styles.navContent}>
-        <View style={styles.profileCircle} />
+        <TouchableOpacity 
+          onPress={() => setShowProfileMenu(true)}
+        >
+          <View style={styles.profileCircle} />
+        </TouchableOpacity>
+        
         <View style={styles.iconsContainer}>
           <View style={styles.iconCircle}>
             <Ionicons name="notifications-outline" size={24} color="#4b5563" />
@@ -73,6 +106,31 @@ const Nav = () => {
         </View>
       </View>
 
+      {/* Profile Menu Modal */}
+      <Modal
+        visible={showProfileMenu}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setShowProfileMenu(false)}
+      >
+        <TouchableOpacity 
+          style={styles.modalOverlay}
+          activeOpacity={1}
+          onPress={() => setShowProfileMenu(false)}
+        >
+          <View style={styles.menuContainer}>
+            <TouchableOpacity 
+              style={styles.menuItem}
+              onPress={handleSignOut}
+            >
+              <Ionicons name="log-out-outline" size={24} color="#dc2626" />
+              <Text style={styles.signOutText}>Sign Out</Text>
+            </TouchableOpacity>
+          </View>
+        </TouchableOpacity>
+      </Modal>
+
+      {/* Existing Modals */}
       <ImagePickerModal
         visible={imagePickerVisible}
         onClose={() => setImagePickerVisible(false)}
@@ -137,6 +195,37 @@ const styles = StyleSheet.create({
   },
   submitButtonDisabled: {
     backgroundColor: '#ccc',
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'flex-start',
+  },
+  menuContainer: {
+    backgroundColor: 'white',
+    marginTop: 80, // Adjust based on your nav height
+    marginHorizontal: 16,
+    borderRadius: 12,
+    padding: 8,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  menuItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
+    gap: 12,
+  },
+  signOutText: {
+    color: '#dc2626',
+    fontSize: 16,
+    fontWeight: '600',
   },
 });
 

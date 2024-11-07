@@ -5,8 +5,12 @@ import Nav from "../../components/Nav";
 import QuickAction from "../../components/QuickAction";
 import MiniList from "../../components/MiniList";
 import { InventoryProvider } from '../../store/InventoryContext';
+import { useAuth } from '../../store/AuthContext';
 
 const Main = () => {
+  const { session } = useAuth();
+  const displayName = session?.user?.user_metadata?.display_name || 'User';
+
   return (
     <InventoryProvider>
       <SafeAreaView style={styles.safeArea}>
@@ -18,8 +22,14 @@ const Main = () => {
             style={styles.header}
           >
             <View style={styles.headerContent}>
-              <Text style={styles.greeting}>Hello, Michael</Text>
-              <Text style={styles.date}>Tue, 3 Aug</Text>
+              <Text style={styles.greeting}>Hello, {displayName}</Text>
+              <Text style={styles.date}>
+                {new Date().toLocaleDateString('en-US', { 
+                  weekday: 'short', 
+                  day: 'numeric', 
+                  month: 'short' 
+                })}
+              </Text>
             </View>
           </Animated.View>
 

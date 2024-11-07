@@ -29,12 +29,10 @@ const ListHeader = () => (
 
 const MiniList = () => {
   const { state } = useInventory();
-  // const { addTestData } = useInventoryActions();
   const { products, isLoading, error } = state;
 
-  // const handleAddTestData = () => {
-  //   addTestData();
-  // };
+  // Limit products to first 5
+  const limitedProducts = products.slice(0, 5);
 
   if (isLoading) {
     return <View style={styles.wrapper}><Text>Loading...</Text></View>;
@@ -48,16 +46,10 @@ const MiniList = () => {
     <View style={styles.wrapper}>
       <View style={styles.headerContainer}>
         <Text style={styles.sectionTitle}>Products</Text>
-        {/* <TouchableOpacity 
-          style={styles.addButton} 
-          onPress={handleAddTestData}
-        >
-          <Text style={styles.addButtonText}>Add Test Data</Text>
-        </TouchableOpacity> */}
       </View>
       <View style={styles.container}>
         <FlatList
-          data={products}
+          data={limitedProducts}
           renderItem={({ item }) => (
             <ListItem 
               item={item} 

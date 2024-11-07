@@ -70,25 +70,18 @@ const QuickAction = () => {
 
       {/* Bottom Quick Action Buttons */}
       <View style={styles.buttonsContainer}>
-        <View style={styles.topButtons}>
-          <View style={[styles.actionButton, styles.activeButton]}>
-            <Text style={[styles.buttonText, styles.activeButtonText]}>Today</Text>
-          </View>
-          <View style={[styles.actionButton, { marginHorizontal: 8 }]}>
-            <Text style={styles.buttonText}>This Week</Text>
-          </View>
-          <TouchableOpacity 
-            style={styles.actionButton}
-            onPress={handleExpensesPress}
-          >
-            <Text style={styles.buttonText}>Expenses</Text>
-          </TouchableOpacity>
-        </View>
+        <TouchableOpacity 
+          style={[styles.actionButton, styles.darkButton]}
+          onPress={handleExpensesPress}
+        >
+          <Text style={styles.buttonText}>Expenses</Text>
+        </TouchableOpacity>
+
         <TouchableOpacity
-          style={[styles.actionButton, styles.customButton]}
+          style={[styles.actionButton, styles.darkButton]}
           onPress={handleSalesPress}
         >
-          <Text style={styles.customButtonText}>Sales Record</Text>
+          <Text style={styles.buttonText}>Sales Record</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -148,45 +141,21 @@ const styles = StyleSheet.create({
     color: '#6b7280',
   },
   buttonsContainer: {
+    flexDirection: 'row',
     paddingHorizontal: 24,
     marginTop: 24,
     gap: 12,
-    width: '100%',
-    alignSelf: 'center',
-  },
-  topButtons: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    width: '100%',
   },
   actionButton: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 6,
-    backgroundColor: '#f3f4f6',
-    minWidth: 80,
-    alignItems: 'center',
-  },
-  activeButton: {
-    backgroundColor: '#000',
-  },
-  customButton: {
-    backgroundColor: '#000',
+    flex: 1,
     paddingVertical: 16,
-    width: '100%',
     borderRadius: 12,
     alignItems: 'center',
-    marginVertical: 16,
+  },
+  darkButton: {
+    backgroundColor: '#000',
   },
   buttonText: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: '#6b7280',
-  },
-  activeButtonText: {
-    color: '#fff',
-  },
-  customButtonText: {
     fontSize: 16,
     fontWeight: '600',
     color: '#fff',
