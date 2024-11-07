@@ -38,7 +38,14 @@ export default function RootLayout() {
     <AuthProvider>
       <InventoryProvider>
         <ProtectedRoute>
-          <Stack screenOptions={{ headerShown: false }} />
+          <Stack 
+            screenOptions={{
+              headerShown: false,
+              gestureEnabled: true,
+              gestureDirection: 'horizontal',
+              animation: 'slide_from_right'
+            }} 
+          />
         </ProtectedRoute>
       </InventoryProvider>
     </AuthProvider>
