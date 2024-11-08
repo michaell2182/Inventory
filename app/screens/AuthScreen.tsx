@@ -14,6 +14,9 @@ import {
 import { supabase } from "../../lib/supabase";
 import { Ionicons } from '@expo/vector-icons';
 
+const TEST_EMAIL = "test@example.com";
+const TEST_PASSWORD = "testpassword123";
+
 const AuthScreen = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -27,7 +30,7 @@ const AuthScreen = () => {
       Alert.alert("Error", "Please fill in all fields");
       return;
     }
-
+  
     setLoading(true);
     try {
       if (isLogin) {
@@ -37,7 +40,7 @@ const AuthScreen = () => {
         });
         if (error) throw error;
       } else {
-        const { data, error } = await supabase.auth.signUp({
+        const { error } = await supabase.auth.signUp({
           email,
           password,
           options: {
@@ -47,24 +50,35 @@ const AuthScreen = () => {
           },
         });
         if (error) throw error;
-        Alert.alert(
-          "Verification Email Sent",
-          "Please check your email (including spam folder) for the confirmation link. This may take a few minutes.",
-          [
-            {
-              text: "OK",
-              onPress: () => {
-                setIsLogin(true); // Switch back to login view
-                setEmail("");
-                setPassword("");
-                setDisplayName("");
-              },
-            },
-          ]
-        );
+  
+        // Remove the verification alert and directly switch back to login mode
+        setIsLogin(true);
+        setEmail("");
+        setPassword("");
+        setDisplayName("");
       }
-    } catch (error: any) {
+    } catch (error) {
       Alert.alert("Error", error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+
+  const handleTestLogin = async () => {
+    setEmail(TEST_EMAIL);
+    setPassword(TEST_PASSWORD);
+    setLoading(true);
+    
+    try {
+      const { error } = await supabase.auth.signInWithPassword({
+        email: TEST_EMAIL,
+        password: TEST_PASSWORD,
+      });
+      if (error) throw error;
+    } catch (error: any) {
+      Alert.alert("Error", "Test account not found. Please create it first.");
+      // Optionally create the test account here if it doesn't exist
     } finally {
       setLoading(false);
     }
@@ -136,6 +150,16 @@ const AuthScreen = () => {
               </TouchableOpacity>
             </View>
           </View>
+
+          {isLogin && (
+            <TouchableOpacity
+              style={[styles.testButton, loading && styles.buttonDisabled]}
+              onPress={handleTestLogin}
+              disabled={loading}
+            >
+              <Text style={styles.testButtonText}>Use Test Account</Text>
+            </TouchableOpacity>
+          )}
 
           <TouchableOpacity
             style={[styles.button, loading && styles.buttonDisabled]}
@@ -254,6 +278,18 @@ const styles = StyleSheet.create({
   switchTextBold: {
     color: "#1a1a1a",
     fontWeight: "600",
+  },
+  testButton: {
+    backgroundColor: '#f0f0f0',
+    padding: 12,
+    borderRadius: 12,
+    alignItems: 'center',
+    marginTop: 16,
+  },
+  testButtonText: {
+    color: '#666',
+    fontSize: 14,
+    fontWeight: '600',
   },
 });
 
