@@ -1,3 +1,10 @@
 {
-  "conventionalCommits.scopes": ["Sales Report Tab", "Expense", "Login'", "IOS"]
+  "conventionalCommits.scopes": [
+    "Sales Report Tab",
+    "Expense",
+    "Login'",
+    "IOS",
+    "Product",
+    "Payment"
+  ]
 }

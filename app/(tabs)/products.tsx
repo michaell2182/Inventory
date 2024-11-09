@@ -247,7 +247,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: 'white',
-    marginTop: 80,
+    paddingTop: 80,
   },
   listContainer: {
     padding: 16,

@@ -5,6 +5,7 @@ import * as ImagePicker from 'expo-image-picker';
 import ImagePickerModal from './ImagePickerModal';
 import AddProductForm from './AddProductForm';
 import { useAuth } from '../store/AuthContext';
+import { useRouter } from 'expo-router';
 
 const Nav = () => {
   const { signOut } = useAuth();
@@ -13,6 +14,8 @@ const Nav = () => {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const router = useRouter();
+  const userTier = 'Basic' as const;
 
   const handleCameraPress = () => {
     setImagePickerVisible(true);
@@ -87,6 +90,10 @@ const Nav = () => {
     );
   };
 
+  const handleUpgrade = () => {
+    router.push('/monetization');
+  };
+
   const renderProfileMenu = () => (
     <Modal
       visible={showProfileMenu}
@@ -107,6 +114,21 @@ const Nav = () => {
             <View style={styles.avatarLarge} />
             <Text style={styles.profileName}>Test User</Text>
             <Text style={styles.profileEmail}>test@example.com</Text>
+            
+            {userTier !== 'Enterprise' && (
+              <TouchableOpacity 
+                style={styles.upgradeButton}
+                onPress={handleUpgrade}
+              >
+                <View style={styles.upgradeContent}>
+                  <Ionicons name="star" size={18} color="#fff" />
+                  <Text style={styles.upgradeText}>Upgrade Now</Text>
+                </View>
+                {/* <View style={styles.upgradeBadge}>
+                  <Text style={styles.upgradeBadgeText}>SAVE 20%</Text>
+                </View> */}
+              </TouchableOpacity>
+            )}
           </View>
           
           <View style={styles.menuDivider} />
@@ -139,11 +161,24 @@ const Nav = () => {
   return (
     <View style={styles.navContainer}>
       <View style={styles.navContent}>
-        <TouchableOpacity 
-          onPress={() => setShowProfileMenu(true)}
-        >
-          <View style={styles.profileCircle} />
-        </TouchableOpacity>
+        <View style={styles.profileSection}>
+          <TouchableOpacity 
+            onPress={() => setShowProfileMenu(true)}
+          >
+            <View style={styles.profileCircle} />
+          </TouchableOpacity>
+          <TouchableOpacity 
+            style={styles.tierBadge}
+            onPress={handleUpgrade}
+          >
+            <Text style={styles.tierText}>{userTier} Plan</Text>
+            {userTier === 'Basic' && (
+              <View style={styles.upgradeIndicator}>
+                <Ionicons name="arrow-up-circle" size={16} color="#4f46e5" />
+              </View>
+            )}
+          </TouchableOpacity>
+        </View>
         
         <View style={styles.iconsContainer}>
           <View style={styles.iconCircle}>
@@ -182,7 +217,8 @@ const Nav = () => {
 const styles = StyleSheet.create({
   navContainer: {
     backgroundColor: '#fff',
-    paddingTop: 24, // Adjust based on your device's status bar
+    paddingTop: 24, 
+
 
   },
   navContent: {
@@ -307,6 +343,65 @@ const styles = StyleSheet.create({
     color: '#dc2626',
     fontSize: 16,
     fontWeight: '500',
+  },
+  profileSection: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  tierBadge: {
+    backgroundColor: '#f3f4f6',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  tierText: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#4b5563',
+  },
+  upgradeIndicator: {
+    backgroundColor: '#e0e7ff',
+    padding: 4,
+    borderRadius: 12,
+  },
+  upgradeButton: {
+    backgroundColor: '#4f46e5',
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 12,
+    marginTop: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    position: 'relative',
+  },
+  upgradeContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  upgradeText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  upgradeBadge: {
+    position: 'absolute',
+    top: -10,
+    right: -10,
+    backgroundColor: '#dc2626',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  upgradeBadgeText: {
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: '700',
   },
 });
 
