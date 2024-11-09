@@ -51,6 +51,7 @@ const inventoryReducer = (state: State, action: Action): State => {
 };
 
 type InventoryContextType = {
+  products: Product[];
   state: State;
   addProduct: (product: Omit<Product, 'id' | 'user_id'>) => Promise<void>;
   updateProduct: (id: string, updates: Partial<Product>) => Promise<void>;
@@ -159,6 +160,7 @@ export function InventoryProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <InventoryContext.Provider value={{
+      products: state.products,
       state,
       addProduct,
       updateProduct,

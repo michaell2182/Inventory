@@ -2,27 +2,42 @@ import React from "react";
 import { View, Text, StyleSheet, FlatList, Image, TouchableOpacity, ActivityIndicator } from "react-native";
 import { useInventory } from '../store/InventoryContext';
 import { Product } from '../types/inventory';
-// import { useInventoryActions } from '../hooks/useInventoryActions';
 import { Ionicons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
+import { useFocusEffect } from '@react-navigation/native';
 
-const ListItem = ({ item, onPress }: { item: Product; onPress: () => void }) => (
-  <TouchableOpacity onPress={onPress} style={styles.listItem}>
-    <View style={styles.leftContent}>
-      <Text style={styles.itemTitle}>{item.title}</Text>
-      <Text style={styles.itemPrice}>${item.price.toFixed(2)} · {item.quantity} QTY</Text>
-      <View style={styles.detailsWrapper}>
-        <Text style={styles.detailsButton}>Details</Text>
+const ListItem = ({ item, onPress }: { item: Product; onPress: () => void }) => {
+  const router = useRouter();
+
+  // Function to handle the ellipsis icon press
+  const handleEllipsisPress = () => {
+    router.push('/products');  // Navigate to the products tab
+  };
+
+  return (
+    <TouchableOpacity onPress={onPress} style={styles.listItem}>
+      <View style={styles.leftContent}>
+        <View style={styles.titleContainer}>
+          <Text style={styles.itemTitle}>{item.title}</Text>
+          {/* <TouchableOpacity onPress={handleEllipsisPress} style={styles.ellipsisButton}>
+            <Ionicons name="ellipsis-horizontal-outline" size={20} color="black" />
+          </TouchableOpacity> */}
+        </View>
+        <Text style={styles.itemPrice}>${item.price.toFixed(2)} · {item.quantity} QTY</Text>
+        <View style={styles.detailsWrapper}>
+          <Text style={styles.detailsButton}>Details</Text>
+        </View>
       </View>
-    </View>
-    <View style={styles.imageContainer}>
-      {item.image_url ? (
-        <Image source={{ uri: item.image_url }} style={styles.image} />
-      ) : (
-        <View style={styles.image} />
-      )}
-    </View>
-  </TouchableOpacity>
-);
+      <View style={styles.imageContainer}>
+        {item.image_url ? (
+          <Image source={{ uri: item.image_url }} style={styles.image} />
+        ) : (
+          <View style={styles.image} />
+        )}
+      </View>
+    </TouchableOpacity>
+  );
+};
 
 const ListHeader = () => (
   <View style={styles.headerLine} />
@@ -43,23 +58,41 @@ const EmptyState = () => (
 );
 
 const MiniList = () => {
-  const { state } = useInventory();
-  const { products, isLoading, error } = state;
+  const { state, fetchProducts } = useInventory();
+  const { products, isLoading } = state;
+  const router = useRouter();
 
-  const limitedProducts = products.slice(0, 5);
+  // Add focus effect to refresh data
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchProducts();
+    }, [])
+  );
+
+  // Limit to 5 most recent products, sorted by date
+  const limitedProducts = products
+    .sort((a, b) => new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime())
+    .slice(0, 5);
+
+  const handleViewAll = () => {
+    router.push('/products');
+  };
+
+  const handleMorePress = (product: Product) => {
+    router.push('/products');
+  };
 
   if (isLoading) {
     return <View style={styles.wrapper}><Text>Loading...</Text></View>;
-  }
-
-  if (error) {
-    return <View style={styles.wrapper}><Text>Error: {error}</Text></View>;
   }
 
   return (
     <View style={styles.wrapper}>
       <View style={styles.headerContainer}>
         <Text style={styles.sectionTitle}>Products</Text>
+        <TouchableOpacity onPress={handleViewAll} style={styles.viewAllButton}>
+          <Ionicons name="ellipsis-horizontal" size={24} color="#1a1a1a" />
+        </TouchableOpacity>
       </View>
       <View style={styles.container}>
         {products.length === 0 ? (
@@ -121,6 +154,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '700',
   },
+  ellipsisButton: {
+    padding: 4,  // Add some padding for better touch target
+  },
   itemPrice: {
     fontSize: 14,
     color: '#6b7280',
@@ -151,7 +187,6 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 20,
     fontWeight: '600',
-    // marginBottom: 16,
     paddingLeft: 3,
   },
   headerContainer: {
@@ -203,6 +238,17 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     lineHeight: 20,
   },
+  moreButton: {
+    padding: 8,
+  },
+  titleContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  viewAllButton: {
+    padding: 8,
+  },
 });
 
-export default MiniList; 
+export default MiniList;

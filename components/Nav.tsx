@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, TouchableOpacity, Text, Modal, Alert } from 'react-native';
+import { View, StyleSheet, TouchableOpacity, Text, Modal, Alert, Platform, Dimensions } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import ImagePickerModal from './ImagePickerModal';
@@ -87,6 +87,55 @@ const Nav = () => {
     );
   };
 
+  const renderProfileMenu = () => (
+    <Modal
+      visible={showProfileMenu}
+      transparent={true}
+      animationType="fade"
+      onRequestClose={() => setShowProfileMenu(false)}
+    >
+      <TouchableOpacity 
+        style={styles.modalOverlay}
+        activeOpacity={1}
+        onPress={() => setShowProfileMenu(false)}
+      >
+        <View style={styles.menuContainer}>
+          <View style={styles.popoverArrow} />
+          
+          {/* Profile Header */}
+          <View style={styles.profileHeader}>
+            <View style={styles.avatarLarge} />
+            <Text style={styles.profileName}>Test User</Text>
+            <Text style={styles.profileEmail}>test@example.com</Text>
+          </View>
+          
+          <View style={styles.menuDivider} />
+          
+          {/* Menu Items */}
+          <TouchableOpacity style={styles.menuItem}>
+            <Ionicons name="settings-outline" size={22} color="#4b5563" />
+            <Text style={styles.menuItemText}>Settings</Text>
+          </TouchableOpacity>
+          
+          <TouchableOpacity style={styles.menuItem}>
+            <Ionicons name="help-circle-outline" size={22} color="#4b5563" />
+            <Text style={styles.menuItemText}>Help & Support</Text>
+          </TouchableOpacity>
+          
+          <View style={styles.menuDivider} />
+          
+          <TouchableOpacity 
+            style={[styles.menuItem, styles.signOutItem]}
+            onPress={handleSignOut}
+          >
+            <Ionicons name="log-out-outline" size={22} color="#dc2626" />
+            <Text style={styles.signOutText}>Sign Out</Text>
+          </TouchableOpacity>
+        </View>
+      </TouchableOpacity>
+    </Modal>
+  );
+
   return (
     <View style={styles.navContainer}>
       <View style={styles.navContent}>
@@ -106,29 +155,7 @@ const Nav = () => {
         </View>
       </View>
 
-      {/* Profile Menu Modal */}
-      <Modal
-        visible={showProfileMenu}
-        transparent={true}
-        animationType="fade"
-        onRequestClose={() => setShowProfileMenu(false)}
-      >
-        <TouchableOpacity 
-          style={styles.modalOverlay}
-          activeOpacity={1}
-          onPress={() => setShowProfileMenu(false)}
-        >
-          <View style={styles.menuContainer}>
-            <TouchableOpacity 
-              style={styles.menuItem}
-              onPress={handleSignOut}
-            >
-              <Ionicons name="log-out-outline" size={24} color="#dc2626" />
-              <Text style={styles.signOutText}>Sign Out</Text>
-            </TouchableOpacity>
-          </View>
-        </TouchableOpacity>
-      </Modal>
+      {renderProfileMenu()}
 
       {/* Existing Modals */}
       <ImagePickerModal
@@ -199,22 +226,67 @@ const styles = StyleSheet.create({
   modalOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'flex-start',
   },
   menuContainer: {
+    position: 'absolute',
+    top: Platform.OS === 'ios' ? 100 : 80,
+    left: 16,
     backgroundColor: 'white',
-    marginTop: 80, // Adjust based on your nav height
-    marginHorizontal: 16,
-    borderRadius: 12,
-    padding: 8,
+    borderRadius: 16,
+    width: Dimensions.get('window').width - 32,
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
-      height: 2,
+      height: 4,
     },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
+    elevation: 8,
+    overflow: 'hidden',
+  },
+  popoverArrow: {
+    position: 'absolute',
+    top: -10,
+    left: 30,
+    width: 20,
+    height: 20,
+    backgroundColor: 'white',
+    transform: [{ rotate: '45deg' }],
+    shadowColor: '#000',
+    shadowOffset: {
+      width: -2,
+      height: -2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  profileHeader: {
+    alignItems: 'center',
+    padding: 24,
+    backgroundColor: '#f8fafc',
+  },
+  avatarLarge: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: '#e2e8f0',
+    marginBottom: 12,
+  },
+  profileName: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#1a1a1a',
+    marginBottom: 4,
+  },
+  profileEmail: {
+    fontSize: 14,
+    color: '#64748b',
+  },
+  menuDivider: {
+    height: 1,
+    backgroundColor: '#e2e8f0',
+    marginHorizontal: 16,
   },
   menuItem: {
     flexDirection: 'row',
@@ -222,10 +294,19 @@ const styles = StyleSheet.create({
     padding: 16,
     gap: 12,
   },
+  menuItemText: {
+    fontSize: 16,
+    color: '#4b5563',
+    fontWeight: '500',
+  },
+  signOutItem: {
+    marginTop: 4,
+    marginBottom: 4,
+  },
   signOutText: {
     color: '#dc2626',
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: '500',
   },
 });
 
