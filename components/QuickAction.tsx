@@ -1,7 +1,9 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { View, StyleSheet, Text, TouchableOpacity } from "react-native";
 import { Svg, Path } from "react-native-svg";
 import { useRouter } from 'expo-router';
+import { supabase } from '../lib/supabase';
+import { useAuth } from '../store/AuthContext';
 
 const UpTrendIcon = () => (
   <Svg width="24" height="24" viewBox="0 0 24 24" fill="none">
@@ -29,13 +31,47 @@ const DownTrendIcon = () => (
 
 const QuickAction = () => {
   const router = useRouter();
+  const { userTier } = useAuth();
+  const [totalRevenue, setTotalRevenue] = useState(0);
+  const [totalExpenses, setTotalExpenses] = useState(0);
+
+  useEffect(() => {
+    fetchTotals();
+  }, []);
+
+  const fetchTotals = async () => {
+    try {
+      // Fetch total revenue from sales
+      const { data: salesData, error: salesError } = await supabase
+        .from('sales')
+        .select('amount');
+      
+      if (salesError) throw salesError;
+      
+      const revenue = salesData?.reduce((sum, sale) => sum + (sale.amount || 0), 0) || 0;
+      setTotalRevenue(revenue);
+
+      // Fetch total expenses
+      const { data: expensesData, error: expensesError } = await supabase
+        .from('expenses')
+        .select('amount');
+      
+      if (expensesError) throw expensesError;
+      
+      const expenses = expensesData?.reduce((sum, expense) => sum + (expense.amount || 0), 0) || 0;
+      setTotalExpenses(expenses);
+
+    } catch (error) {
+      console.error('Error fetching totals:', error);
+    }
+  };
 
   const handleSalesPress = () => {
     router.push('/sales');
   };
 
   const handleExpensesPress = () => {
-    router.push('expenses');
+    router.push('/expenses');
   };
 
   return (
@@ -43,28 +79,31 @@ const QuickAction = () => {
       {/* Top Cards */}
       <View style={styles.cardsContainer}>
         <View style={styles.revenueCard}>
-          <View style={styles.topContainer}>
-            <View style={styles.circle}>
-              <Text style={styles.icon}>$</Text>
-            </View>
-            <Text style={styles.label}>PROFIT</Text>
-            <View style={styles.trendContainer}>
-              <UpTrendIcon />
+          <View style={styles.cardHeader}>
+            <Text style={styles.cardTitle}>Total Revenue</Text>
+            <View style={[styles.badge, styles.positiveBadge]}>
+              <Text style={styles.badgeText}>+2.5%</Text>
             </View>
           </View>
-          <Text style={styles.amount}>$0</Text>
+          <Text style={styles.amount}>${totalRevenue.toFixed(2)}</Text>
+          <View style={styles.trendContainer}>
+            <UpTrendIcon />
+            <Text style={styles.trendText}>vs last month</Text>
+          </View>
         </View>
+
         <View style={styles.revenueCard}>
-          <View style={styles.topContainer}>
-            <View style={styles.circle}>
-              <Text style={styles.icon}>$</Text>
-            </View>
-            <Text style={styles.label}>SALES COST</Text>
-            <View style={styles.trendContainer}>
-              <DownTrendIcon />
+          <View style={styles.cardHeader}>
+            <Text style={styles.cardTitle}>Total Expenses</Text>
+            <View style={[styles.badge, styles.negativeBadge]}>
+              <Text style={styles.badgeText}>-1.5%</Text>
             </View>
           </View>
-          <Text style={styles.amount}>$0</Text>
+          <Text style={styles.amount}>${totalExpenses.toFixed(2)}</Text>
+          <View style={styles.trendContainer}>
+            <DownTrendIcon />
+            <Text style={styles.trendText}>vs last month</Text>
+          </View>
         </View>
       </View>
 
@@ -91,58 +130,71 @@ const QuickAction = () => {
 const styles = StyleSheet.create({
   cardsContainer: {
     flexDirection: "row",
-    paddingHorizontal: 24,
-    marginTop: 0,
+    paddingHorizontal: 16,
+    gap: 16,
+    marginTop: 16,
   },
   revenueCard: {
     flex: 1,
-    padding: 24,
-    borderRadius: 20,
-    backgroundColor: '#f8f9fa',
-    marginHorizontal: 8,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
+    padding: 16,
+    borderRadius: 16,
+    backgroundColor: '#fff',
+    // shadowColor: '#000',
+    // shadowOffset: {
+    //   width: 0,
+    //   height: 2,
+    // },
+    // shadowOpacity: 0.1,
+    // shadowRadius: 8,
     elevation: 4,
   },
-  topContainer: {
+  cardHeader: {
     flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
     justifyContent: 'space-between',
-  },
-  circle: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: "#e5e7eb",
-    justifyContent: 'center',
     alignItems: 'center',
+    marginBottom: 8,
   },
-  icon: {
-    fontSize: 20,
-    color: '#4b5563',
+  cardTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#6b7280',
+  },
+  badge: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  positiveBadge: {
+    backgroundColor: '#dcfce7',
+  },
+  negativeBadge: {
+    backgroundColor: '#fee2e2',
+  },
+  badgeText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#16a34a',
   },
   amount: {
-    fontSize: 28,
+    fontSize: 24,
     fontWeight: '700',
-    marginTop: 8,
     color: '#111827',
+    marginVertical: 8,
   },
-  label: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: '#4b5563',
+  trendContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  trendText: {
+    fontSize: 12,
+    color: '#6b7280',
   },
   buttonsContainer: {
     flexDirection: 'row',
-    paddingHorizontal: 24,
+    paddingHorizontal: 16,
     marginTop: 24,
-    gap: 12,
+    gap: 16,
   },
   actionButton: {
     flex: 1,
@@ -157,10 +209,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     color: '#fff',
-    textAlign: 'center',
-  },
-  trendContainer: {
-    marginLeft: 'auto',
   },
 });
 

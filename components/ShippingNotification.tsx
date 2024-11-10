@@ -1,7 +1,30 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, Button } from 'react-native';
+import { View, Text, StyleSheet, TextInput, Button, TouchableOpacity } from 'react-native';
+import { useRouter } from 'expo-router';
+import { useAuth } from '../store/AuthContext';
 
 const ShippingNotification = () => {
+  const { userTier } = useAuth();
+  const canUseNotifications = userTier === 'Premium' || userTier === 'Enterprise';
+  const router = useRouter();
+
+  if (!canUseNotifications) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.title}>Shipping Notification</Text>
+        <Text style={styles.upgradeText}>
+          Upgrade to Premium to use shipping notifications
+        </Text>
+        <TouchableOpacity
+          style={styles.upgradeButton}
+          onPress={() => router.push('/monetization')}
+        >
+          <Text style={styles.upgradeButtonText}>Upgrade Now</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+
   const [trackingNumber, setTrackingNumber] = useState('');
   const [estimatedDelivery, setEstimatedDelivery] = useState('');
 
@@ -45,6 +68,23 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 8,
     marginBottom: 16,
+  },
+  upgradeText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#16a34a',
+    marginBottom: 16,
+  },
+  upgradeButton: {
+    backgroundColor: '#16a34a',
+    paddingVertical: 16,
+    borderRadius: 12,
+    alignItems: 'center',
+  },
+  upgradeButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#fff',
   },
 });
 
