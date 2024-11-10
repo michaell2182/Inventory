@@ -9,6 +9,7 @@ type AuthContextType = {
   loading: boolean;
   userTier: SubscriptionTier;
   signOut: () => Promise<void>;
+  refreshTier: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextType>({
@@ -17,6 +18,7 @@ const AuthContext = createContext<AuthContextType>({
   loading: true,
   userTier: 'Basic',
   signOut: async () => {},
+  refreshTier: async () => {},
 });
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
@@ -62,13 +64,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const refreshTier = async () => {
+    if (session?.user) {
+      const tier = await TierManager.getCurrentTier(session.user.id);
+      setUserTier(tier);
+    }
+  };
+
   return (
     <AuthContext.Provider value={{ 
       user: session?.user || null, 
       session, 
       loading, 
       userTier,
-      signOut 
+      signOut,
+      refreshTier
     }}>
       {children}
     </AuthContext.Provider>

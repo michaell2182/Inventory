@@ -11,12 +11,15 @@ export class TierManager {
         .eq('user_id', userId)
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching tier:', error);
+        return 'Basic'; // Default to Basic if there's an error
+      }
       
-      return data?.tier || 'Premium'; // Default to Basic if no tier is set
+      return (data?.tier as SubscriptionTier) || 'Basic';
     } catch (error) {
-      console.error('Error fetching tier:', error);
-      return 'Basic'; // Default to Basic on error
+      console.error('Error in getCurrentTier:', error);
+      return 'Basic';
     }
   }
 
@@ -28,12 +31,18 @@ export class TierManager {
           user_id: userId, 
           tier: tier,
           updated_at: new Date().toISOString()
+        }, {
+          onConflict: 'user_id'
         });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error in setUserTier:', error);
+        return false;
+      }
+
       return true;
     } catch (error) {
-      console.error('Error setting tier:', error);
+      console.error('Error in setUserTier:', error);
       return false;
     }
   }

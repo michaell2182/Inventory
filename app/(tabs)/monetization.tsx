@@ -16,7 +16,7 @@ const PlanFeature = ({ text }: { text: string }) => (
 
 const MonetizationScreen = () => {
   const [selectedPlan, setSelectedPlan] = useState<SubscriptionTier>('Basic');
-  const { user, userTier } = useAuth();
+  const { user, userTier, refreshTier } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
@@ -34,9 +34,16 @@ const MonetizationScreen = () => {
     }
 
     try {
+      console.log('Updating tier for user:', user.id, 'to:', selectedPlan);
       const success = await TierManager.setUserTier(user.id, selectedPlan);
       
-      if (!success) throw new Error('Failed to update tier');
+      if (!success) {
+        console.error('Failed to update tier');
+        throw new Error('Failed to update tier');
+      }
+
+      // Refresh the tier in AuthContext
+      await refreshTier();
 
       Alert.alert(
         'Success',
@@ -50,7 +57,10 @@ const MonetizationScreen = () => {
       );
     } catch (error) {
       console.error('Error updating subscription:', error);
-      Alert.alert('Error', 'Failed to update subscription tier');
+      Alert.alert(
+        'Error', 
+        'Failed to update subscription tier. Please try again later.'
+      );
     }
   };
 

@@ -8,14 +8,13 @@ import { useAuth } from '../store/AuthContext';
 import { useRouter } from 'expo-router';
 
 const Nav = () => {
-  const { signOut } = useAuth();
+  const { signOut, userTier } = useAuth();
   const [imagePickerVisible, setImagePickerVisible] = useState(false);
   const [formVisible, setFormVisible] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const router = useRouter();
-  const userTier = 'Basic' as const;
 
   const handleCameraPress = () => {
     setImagePickerVisible(true);
