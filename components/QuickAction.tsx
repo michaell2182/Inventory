@@ -42,7 +42,7 @@ const QuickAction = () => {
     <View>
       {/* Top Cards */}
       <View style={styles.cardsContainer}>
-        <View style={styles.actionItem}>
+        <View style={styles.revenueCard}>
           <View style={styles.topContainer}>
             <View style={styles.circle}>
               <Text style={styles.icon}>$</Text>
@@ -54,7 +54,7 @@ const QuickAction = () => {
           </View>
           <Text style={styles.amount}>$0</Text>
         </View>
-        <View style={styles.actionItem}>
+        <View style={styles.revenueCard}>
           <View style={styles.topContainer}>
             <View style={styles.circle}>
               <Text style={styles.icon}>$</Text>
@@ -94,51 +94,49 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     marginTop: 0,
   },
-  actionItem: {
+  revenueCard: {
     flex: 1,
-    padding: 16,
-    borderWidth: 1,
-    borderColor: '#e5e7eb',
-    borderRadius: 12,
+    padding: 24,
+    borderRadius: 20,
+    backgroundColor: '#f8f9fa',
     marginHorizontal: 8,
-    backgroundColor: 'white',
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
-      height: 2,
+      height: 4,
     },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 2,
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
   },
   topContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: 12,
     justifyContent: 'space-between',
   },
   circle: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: "#f3f4f6",
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: "#e5e7eb",
     justifyContent: 'center',
     alignItems: 'center',
   },
   icon: {
-    fontSize: 16,
-    color: '#6b7280',
+    fontSize: 20,
+    color: '#4b5563',
   },
   amount: {
-    fontSize: 24,
-    fontWeight: '600',
+    fontSize: 28,
+    fontWeight: '700',
     marginTop: 8,
     color: '#111827',
   },
   label: {
-    fontSize: 12,
+    fontSize: 14,
     fontWeight: '500',
-    color: '#6b7280',
+    color: '#4b5563',
   },
   buttonsContainer: {
     flexDirection: 'row',

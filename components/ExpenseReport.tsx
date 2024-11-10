@@ -4,53 +4,40 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  Modal,
   ActivityIndicator,
 } from 'react-native';
 import { supabase } from '../lib/supabase';
-import DateTimePicker from '@react-native-community/datetimepicker';
 import * as FileSystem from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
-
-interface ReportOptions {
-  startDate: Date;
-  endDate: Date;
-  format: 'PDF' | 'CSV' | 'EXCEL';
-  includeCategories: boolean;
-  includeTags: boolean;
-  includeNotes: boolean;
-}
+import { useAuth } from '../store/AuthContext';
 
 const ExpenseReport = () => {
-  const [options, setOptions] = useState<ReportOptions>({
+  const { session } = useAuth();
+  const user = session?.user as { tier?: 'basic' | 'premium' | 'enterprise' };
+  const [options, setOptions] = useState({
     startDate: new Date(new Date().setMonth(new Date().getMonth() - 1)),
     endDate: new Date(),
     format: 'PDF',
-    includeCategories: true,
-    includeTags: true,
-    includeNotes: false,
+    category: '',
   });
   const [generating, setGenerating] = useState(false);
 
   const generateReport = async () => {
     setGenerating(true);
     try {
-      // Fetch expenses for the date range
       const { data: expenses, error } = await supabase
         .from('expenses')
         .select('*')
         .gte('date', options.startDate.toISOString())
-        .lte('date', options.endDate.toISOString());
+        .lte('date', options.endDate.toISOString())
+        .ilike('category', `%${options.category}%`);
 
       if (error) throw error;
 
-      // Generate report content based on format
-      // This is a simplified example - you'd want to add more formatting
       const reportContent = expenses
         .map(e => `${e.date},${e.description},${e.amount}`)
         .join('\n');
 
-      // Save and share the file
       const fileName = `expenses_${new Date().getTime()}.csv`;
       const filePath = `${FileSystem.documentDirectory}${fileName}`;
       await FileSystem.writeAsStringAsync(filePath, reportContent);
@@ -66,15 +53,10 @@ const ExpenseReport = () => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Generate Report</Text>
-      
-      <View style={styles.optionsContainer}>
-        {/* Add date pickers and format options here */}
-      </View>
-
       <TouchableOpacity
         style={styles.generateButton}
         onPress={generateReport}
-        disabled={generating}
+        disabled={user?.tier === 'basic' || generating}
       >
         {generating ? (
           <ActivityIndicator color="#fff" />
@@ -94,9 +76,6 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: '600',
-    marginBottom: 24,
-  },
-  optionsContainer: {
     marginBottom: 24,
   },
   generateButton: {
