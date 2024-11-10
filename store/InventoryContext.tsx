@@ -3,6 +3,9 @@ import { supabase } from '../lib/supabase';
 import { Product } from '../types/inventory';
 import { useAuth } from './AuthContext';
 
+const FREE_TIER_MAX_PRODUCTS = 50; // Maximum number of products for free tier
+const PAID_TIER_MAX_PRODUCTS = 100; // Maximum number of products for paid tier
+
 type State = {
   products: Product[];
   isLoading: boolean;
@@ -50,15 +53,6 @@ const inventoryReducer = (state: State, action: Action): State => {
   }
 };
 
-type InventoryContextType = {
-  products: Product[];
-  state: State;
-  addProduct: (product: Omit<Product, 'id' | 'user_id'>) => Promise<void>;
-  updateProduct: (id: string, updates: Partial<Product>) => Promise<void>;
-  deleteProduct: (id: string) => Promise<void>;
-  fetchProducts: () => Promise<void>;
-};
-
 const InventoryContext = createContext<InventoryContextType | undefined>(undefined);
 
 export function InventoryProvider({ children }: { children: React.ReactNode }) {
@@ -94,7 +88,23 @@ export function InventoryProvider({ children }: { children: React.ReactNode }) {
   const addProduct = async (product: Omit<Product, 'id' | 'user_id'>) => {
     try {
       dispatch({ type: 'SET_LOADING', payload: true });
-      
+
+      // Determine the maximum products based on user tier
+      const maxProducts = session?.user?.tier === 'free' ? FREE_TIER_MAX_PRODUCTS : PAID_TIER_MAX_PRODUCTS;
+
+      // Fetch the current count of products in the database
+      const { count, error: countError } = await supabase
+        .from('products')
+        .select('id', { count: 'exact' })
+        .eq('user_id', session?.user?.id);
+
+      if (countError) throw countError;
+
+      // Check if the user has reached the maximum number of products
+      if (count !== null && count >= maxProducts) {
+        throw new Error(`You cannot add more than ${maxProducts} products.`);
+      }
+
       const { data, error } = await supabase
         .from('products')
         .insert([
@@ -107,7 +117,7 @@ export function InventoryProvider({ children }: { children: React.ReactNode }) {
         .single();
 
       if (error) throw error;
-      
+
       dispatch({ type: 'ADD_PRODUCT', payload: data });
     } catch (error: any) {
       dispatch({ type: 'SET_ERROR', payload: error.message });
