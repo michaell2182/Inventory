@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../store/AuthContext';
+import { TierManager } from '../../lib/TierManager';
 
 type SubscriptionTier = 'Basic' | 'Premium' | 'Enterprise';
 
@@ -16,8 +16,16 @@ const PlanFeature = ({ text }: { text: string }) => (
 
 const MonetizationScreen = () => {
   const [selectedPlan, setSelectedPlan] = useState<SubscriptionTier>('Basic');
-  const { user } = useAuth();
+  const { user, userTier } = useAuth();
   const router = useRouter();
+
+  useEffect(() => {
+    if (user) {
+      console.log('Current user:', user);
+      console.log('Current tier:', userTier);
+      setSelectedPlan(userTier);
+    }
+  }, [user, userTier]);
 
   const handleUpgrade = async () => {
     if (!user) {
@@ -26,12 +34,9 @@ const MonetizationScreen = () => {
     }
 
     try {
-      const { error } = await supabase
-        .from('profiles')
-        .update({ subscription_tier: selectedPlan })
-        .eq('id', user.id);
-
-      if (error) throw error;
+      const success = await TierManager.setUserTier(user.id, selectedPlan);
+      
+      if (!success) throw new Error('Failed to update tier');
 
       Alert.alert(
         'Success',
