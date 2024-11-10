@@ -2,6 +2,10 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import { supabase } from '../../lib/supabase';
+import { useAuth } from '../../store/AuthContext';
+
+type SubscriptionTier = 'Basic' | 'Premium' | 'Enterprise';
 
 const PlanFeature = ({ text }: { text: string }) => (
   <View style={styles.featureRow}>
@@ -11,12 +15,38 @@ const PlanFeature = ({ text }: { text: string }) => (
 );
 
 const MonetizationScreen = () => {
-  const [selectedPlan, setSelectedPlan] = useState('Basic');
+  const [selectedPlan, setSelectedPlan] = useState<SubscriptionTier>('Basic');
+  const { user } = useAuth();
   const router = useRouter();
 
-  const handleUpgrade = () => {
-    // This will be replaced with Stripe implementation
-    Alert.alert('Coming Soon', 'Payment processing will be implemented with Stripe.');
+  const handleUpgrade = async () => {
+    if (!user) {
+      Alert.alert('Error', 'You must be logged in to change plans');
+      return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({ subscription_tier: selectedPlan })
+        .eq('id', user.id);
+
+      if (error) throw error;
+
+      Alert.alert(
+        'Success',
+        `Your plan has been updated to ${selectedPlan}`,
+        [
+          {
+            text: 'OK',
+            onPress: () => router.back()
+          }
+        ]
+      );
+    } catch (error) {
+      console.error('Error updating subscription:', error);
+      Alert.alert('Error', 'Failed to update subscription tier');
+    }
   };
 
   return (
