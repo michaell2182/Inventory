@@ -11,6 +11,7 @@ import {
 import { Product } from '../types/inventory';
 import { supabase } from '../lib/supabase';
 import { useInventory } from '../store/InventoryContext';
+import { checkAndNotifyLowStock } from '../services/notifications';
 
 type Props = {
   visible: boolean;

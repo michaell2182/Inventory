@@ -2,9 +2,17 @@ import React, { createContext, useContext, useReducer, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { Product } from '../types/inventory';
 import { useAuth } from './AuthContext';
+import * as Notifications from 'expo-notifications';
 
-const FREE_TIER_MAX_PRODUCTS = 50; // Maximum number of products for free tier
-const PAID_TIER_MAX_PRODUCTS = 100; // Maximum number of products for paid tier
+declare module '@supabase/supabase-js' {
+  interface User {
+    tier?: 'basic' | 'premium' | 'enterprise';
+  }
+}
+
+const BASIC_TIER_MAX_PRODUCTS = 50;    // Maximum number of products for basic tier
+const PREMIUM_TIER_MAX_PRODUCTS = 150;  // Maximum number of products for premium tier
+const ENTERPRISE_TIER_MAX_PRODUCTS = Infinity; // No limit for enterprise tier
 
 type State = {
   products: Product[];
@@ -53,6 +61,15 @@ const inventoryReducer = (state: State, action: Action): State => {
   }
 };
 
+type InventoryContextType = {
+  products: Product[];
+  state: State;
+  addProduct: (product: Omit<Product, 'id' | 'user_id'>) => Promise<void>;
+  updateProduct: (id: string, updates: Partial<Product>) => Promise<void>;
+  deleteProduct: (id: string) => Promise<void>;
+  fetchProducts: () => Promise<void>;
+};
+
 const InventoryContext = createContext<InventoryContextType | undefined>(undefined);
 
 export function InventoryProvider({ children }: { children: React.ReactNode }) {
@@ -90,7 +107,14 @@ export function InventoryProvider({ children }: { children: React.ReactNode }) {
       dispatch({ type: 'SET_LOADING', payload: true });
 
       // Determine the maximum products based on user tier
-      const maxProducts = session?.user?.tier === 'free' ? FREE_TIER_MAX_PRODUCTS : PAID_TIER_MAX_PRODUCTS;
+      const maxProducts = (() => {
+        switch (session?.user?.tier) {
+          case 'basic': return BASIC_TIER_MAX_PRODUCTS;
+          case 'premium': return PREMIUM_TIER_MAX_PRODUCTS;
+          case 'enterprise': return ENTERPRISE_TIER_MAX_PRODUCTS;
+          default: return BASIC_TIER_MAX_PRODUCTS; // fallback to basic tier
+        }
+      })();
 
       // Fetch the current count of products in the database
       const { count, error: countError } = await supabase
@@ -102,7 +126,11 @@ export function InventoryProvider({ children }: { children: React.ReactNode }) {
 
       // Check if the user has reached the maximum number of products
       if (count !== null && count >= maxProducts) {
-        throw new Error(`You cannot add more than ${maxProducts} products.`);
+        const tierName = session?.user?.tier || 'basic';
+        throw new Error(
+          `You have reached the maximum limit of ${maxProducts} products for your ${tierName} tier. ` +
+          `Please upgrade your plan to add more products.`
+        );
       }
 
       const { data, error } = await supabase
@@ -134,13 +162,14 @@ export function InventoryProvider({ children }: { children: React.ReactNode }) {
         .from('products')
         .update(updates)
         .eq('id', id)
-        .eq('user_id', session?.user?.id) // Ensure user can only update their own products
+        .eq('user_id', session?.user?.id)
         .select()
         .single();
 
       if (error) throw error;
       
       dispatch({ type: 'UPDATE_PRODUCT', payload: data });
+      checkLowStock(data);
     } catch (error: any) {
       dispatch({ type: 'SET_ERROR', payload: error.message });
     } finally {
@@ -156,7 +185,7 @@ export function InventoryProvider({ children }: { children: React.ReactNode }) {
         .from('products')
         .delete()
         .eq('id', id)
-        .eq('user_id', session?.user?.id); // Ensure user can only delete their own products
+        .eq('user_id', session?.user?.id);
 
       if (error) throw error;
       
@@ -167,6 +196,29 @@ export function InventoryProvider({ children }: { children: React.ReactNode }) {
       dispatch({ type: 'SET_LOADING', payload: false });
     }
   };
+
+  const checkLowStock = async (product: Product) => {
+    if (
+      product.reorder_point && 
+      product.quantity <= product.reorder_point && 
+      product.quantity > 0
+    ) {
+      await Notifications.scheduleNotificationAsync({
+        content: {
+          title: 'Low Stock Alert',
+          body: `${product.title} has ${product.quantity} items remaining (threshold: ${product.reorder_point})`,
+          data: { productId: product.id },
+        },
+        trigger: null, // null means show immediately
+      });
+    }
+  };
+
+  useEffect(() => {
+    state.products.forEach(product => {
+      checkLowStock(product);
+    });
+  }, [state.products]);
 
   return (
     <InventoryContext.Provider value={{
@@ -188,4 +240,4 @@ export function useInventory() {
     throw new Error('useInventory must be used within an InventoryProvider');
   }
   return context;
-} 
+}

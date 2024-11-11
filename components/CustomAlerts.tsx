@@ -42,7 +42,7 @@ const CustomAlerts = () => {
         placeholder="Set low stock threshold"
         keyboardType="numeric"
         value={String(threshold)}
-        onChangeText={setThreshold}
+        onChangeText={(text) => setThreshold(Number(text))}
       />
       <Button title="Set Alert" onPress={handleSetAlert} />
     </View>

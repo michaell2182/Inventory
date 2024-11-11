@@ -44,11 +44,11 @@ const QuickAction = () => {
       // Fetch total revenue from sales
       const { data: salesData, error: salesError } = await supabase
         .from('sales')
-        .select('amount');
+        .select('sale_price');
       
       if (salesError) throw salesError;
       
-      const revenue = salesData?.reduce((sum, sale) => sum + (sale.amount || 0), 0) || 0;
+      const revenue = salesData?.reduce((sum, sale) => sum + (sale.sale_price || 0), 0) || 0;
       setTotalRevenue(revenue);
 
       // Fetch total expenses
@@ -78,34 +78,36 @@ const QuickAction = () => {
     <View>
       {/* Top Cards */}
       <View style={styles.cardsContainer}>
-        <View style={styles.revenueCard}>
-          <View style={styles.cardHeader}>
-            <Text style={styles.cardTitle}>Total Revenue</Text>
-            <View style={[styles.badge, styles.positiveBadge]}>
-              <Text style={styles.badgeText}>+2.5%</Text>
-            </View>
-          </View>
-          <Text style={styles.amount}>${totalRevenue.toFixed(2)}</Text>
-          <View style={styles.trendContainer}>
-            <UpTrendIcon />
-            <Text style={styles.trendText}>vs last month</Text>
-          </View>
-        </View>
-
-        <View style={styles.revenueCard}>
-          <View style={styles.cardHeader}>
-            <Text style={styles.cardTitle}>Total Expenses</Text>
-            <View style={[styles.badge, styles.negativeBadge]}>
-              <Text style={styles.badgeText}>-1.5%</Text>
-            </View>
-          </View>
-          <Text style={styles.amount}>${totalExpenses.toFixed(2)}</Text>
-          <View style={styles.trendContainer}>
-            <DownTrendIcon />
-            <Text style={styles.trendText}>vs last month</Text>
-          </View>
-        </View>
+  {/* Total Expenses card */}
+  <View style={styles.revenueCard}>
+    <View style={styles.cardHeader}>
+      <Text style={styles.cardTitle}>Total Expenses</Text>
+      <View style={[styles.badge, styles.negativeBadge]}>
+        <Text style={styles.badgeText}>-1.5%</Text>
       </View>
+    </View>
+    <Text style={styles.amount}>${totalExpenses.toFixed(2)}</Text>
+    <View style={styles.trendContainer}>
+      <DownTrendIcon />
+      <Text style={styles.trendText}>vs last month</Text>
+    </View>
+  </View>
+
+  {/* Total Revenue card */}
+  <View style={styles.revenueCard}>
+    <View style={styles.cardHeader}>
+      <Text style={styles.cardTitle}>Total Revenue</Text>
+      <View style={[styles.badge, styles.positiveBadge]}>
+        <Text style={styles.badgeText}>+2.5%</Text>
+      </View>
+    </View>
+    <Text style={styles.amount}>${totalRevenue.toFixed(2)}</Text>
+    <View style={styles.trendContainer}>
+      <UpTrendIcon />
+      <Text style={styles.trendText}>vs last month</Text>
+    </View>
+  </View>
+</View>
 
       {/* Bottom Quick Action Buttons */}
       <View style={styles.buttonsContainer}>
@@ -139,13 +141,6 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 16,
     backgroundColor: '#f8f9fa',
-    // shadowColor: '#000',
-    // shadowOffset: {
-    //   width: 0,
-    //   height: 2,
-    // },
-    // shadowOpacity: 0.1,
-    // shadowRadius: 8,
     elevation: 4,
   },
   cardHeader: {

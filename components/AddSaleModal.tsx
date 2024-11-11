@@ -29,6 +29,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import debounce from 'lodash/debounce';
 import * as Haptics from 'expo-haptics';
+import { checkAndNotifyLowStock } from '../services/notifications';
 
 interface SelectedProduct {
   product: any;
@@ -214,6 +215,17 @@ const AddSaleModal = ({ visible, onClose, onSaleComplete }: AddSaleModalProps) =
 
         if (updateError) throw updateError;
       }
+
+      // After successfully creating the sale, check stock levels
+      const product = products.find(product => product.id === selectedProducts[0].product.id);
+      if (!product) return;
+
+      const updatedProduct = {
+        ...product,
+        quantity: product.quantity - parseInt(selectedProducts[0].quantity)
+      };
+      
+      await checkAndNotifyLowStock(updatedProduct);
 
       onSaleComplete();
       onClose();

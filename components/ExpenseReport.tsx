@@ -10,10 +10,10 @@ import { supabase } from '../lib/supabase';
 import * as FileSystem from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
 import { useAuth } from '../store/AuthContext';
+import type { SubscriptionTier } from '../lib/TierManager';
 
 const ExpenseReport = () => {
-  const { session } = useAuth();
-  const user = session?.user as { tier?: 'basic' | 'premium' | 'enterprise' };
+  const { session, userTier } = useAuth();
   const [options, setOptions] = useState({
     startDate: new Date(new Date().setMonth(new Date().getMonth() - 1)),
     endDate: new Date(),
@@ -22,7 +22,18 @@ const ExpenseReport = () => {
   });
   const [generating, setGenerating] = useState(false);
 
+  // Helper function to check if user can generate reports
+  const canGenerateReport = () => {
+    return userTier === 'Premium' || userTier === 'Enterprise';
+  };
+
   const generateReport = async () => {
+    // Early return if user doesn't have required tier
+    if (!canGenerateReport()) {
+      alert('Please upgrade to Premium or Enterprise to generate reports');
+      return;
+    }
+
     setGenerating(true);
     try {
       const { data: expenses, error } = await supabase
@@ -50,19 +61,38 @@ const ExpenseReport = () => {
     }
   };
 
+  // Determine button styles and content based on tier and generating state
+  const buttonStyle = [
+    styles.generateButton,
+    !canGenerateReport() && styles.disabledButton
+  ];
+
+  const renderButtonContent = () => {
+    if (generating) {
+      return <ActivityIndicator color="#fff" />;
+    }
+
+    return (
+      <>
+        <Text style={styles.generateButtonText}>Generate Report</Text>
+        {!canGenerateReport() && (
+          <Text style={styles.upgradeText}>
+            Upgrade to Premium to generate reports
+          </Text>
+        )}
+      </>
+    );
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Generate Report</Text>
       <TouchableOpacity
-        style={styles.generateButton}
+        style={buttonStyle}
         onPress={generateReport}
-        disabled={user?.tier === 'basic' || generating}
+        disabled={!canGenerateReport() || generating}
       >
-        {generating ? (
-          <ActivityIndicator color="#fff" />
-        ) : (
-          <Text style={styles.generateButtonText}>Generate Report</Text>
-        )}
+        {renderButtonContent()}
       </TouchableOpacity>
     </View>
   );
@@ -89,6 +119,14 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
   },
+  disabledButton: {
+    backgroundColor: '#ccc',
+  },
+  upgradeText: {
+    color: '#fff',
+    fontSize: 12,
+    marginTop: 4,
+  },
 });
 
-export default ExpenseReport; 
+export default ExpenseReport;
