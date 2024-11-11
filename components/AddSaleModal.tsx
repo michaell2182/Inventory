@@ -54,8 +54,6 @@ const AddSaleModal = ({ visible, onClose, onSaleComplete }: AddSaleModalProps) =
   const [showNotes, setShowNotes] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const notesHeight = useSharedValue(0);
-  const notesPadding = useSharedValue(0);
-  const notesBorder = useSharedValue(0);
   const searchInputRef = useRef<TextInput>(null);
   const scrollViewRef = useRef<ScrollView>(null);
   const [isSearching, setIsSearching] = useState(false);
@@ -138,13 +136,9 @@ const AddSaleModal = ({ visible, onClose, onSaleComplete }: AddSaleModalProps) =
   const toggleNotes = () => {
     if (!showNotes) {
       setShowNotes(true);
-      notesHeight.value = withSpring(60);
-      notesPadding.value = withSpring(12);
-      notesBorder.value = withSpring(1);
+      notesHeight.value = withTiming(120);
     } else {
-      notesHeight.value = withSpring(0);
-      notesPadding.value = withSpring(0);
-      notesBorder.value = withSpring(0);
+      notesHeight.value = withTiming(0);
       setTimeout(() => {
         setShowNotes(false);
         setNotes('');
@@ -154,8 +148,6 @@ const AddSaleModal = ({ visible, onClose, onSaleComplete }: AddSaleModalProps) =
 
   const animatedNotesStyle = useAnimatedStyle(() => ({
     height: notesHeight.value,
-    padding: notesPadding.value,
-    borderWidth: notesBorder.value,
   }));
 
   const handleDateChange = (event: any, selectedDate?: Date) => {
@@ -375,40 +367,44 @@ const AddSaleModal = ({ visible, onClose, onSaleComplete }: AddSaleModalProps) =
               </Animated.View>
             )}
 
-            {/* Notes Section */}
-            <View style={styles.notesContainer}>
-              <TouchableOpacity 
-                style={styles.notesIcon}
-                onPress={handleNotesToggle}
-              >
-                <Ionicons 
-                  name={showNotes ? "remove-circle-outline" : "add-circle-outline"} 
-                  size={24} 
-                  color="#666" 
-                />
-                <Text style={styles.notesIconText}>
-                  {showNotes ? 'Remove Note' : 'Add Note'}
-                </Text>
-              </TouchableOpacity>
-              {showNotes && (
-                <Animated.View 
-                  style={[styles.notesInputContainer, animatedNotesStyle]}
-                  entering={FadeIn}
-                  exiting={FadeOut}
-                >
-                  <TextInput
-                    style={styles.notesInput}
-                    placeholder="Add sale notes..."
-                    value={notes}
-                    onChangeText={setNotes}
-                    multiline
-                    numberOfLines={2}
-                    returnKeyType="done"
-                    onSubmitEditing={Keyboard.dismiss}
-                  />
-                </Animated.View>
-              )}
-            </View>
+           {/* Notes Section */}
+<View style={styles.notesContainer}>
+  <View style={styles.notesHeader}>
+    <Text style={styles.notesSectionTitle}>Sale Notes</Text>
+    <TouchableOpacity 
+      style={styles.notesToggleButton}
+      onPress={handleNotesToggle}
+    >
+      <Ionicons 
+        name={showNotes ? "remove-circle" : "add-circle"} 
+        size={28} 
+        color="#000" 
+      />
+    </TouchableOpacity>
+  </View>
+  
+  <Animated.View style={[styles.notesContentContainer, animatedNotesStyle]}>
+    {showNotes && (
+      <>
+        <TextInput
+          style={styles.notesInput}
+          placeholder="Add details about this sale..."
+          placeholderTextColor="#666"
+          value={notes}
+          onChangeText={setNotes}
+          multiline
+          maxLength={200}
+          returnKeyType="done"
+          onSubmitEditing={Keyboard.dismiss}
+          blurOnSubmit={true}
+        />
+        <Text style={styles.notesHelper}>
+          {notes.length}/200 characters
+        </Text>
+      </>
+    )}
+  </Animated.View>
+</View>
 
             {/* Action Buttons */}
             <View style={styles.buttonContainer}>
@@ -580,14 +576,14 @@ const styles = StyleSheet.create({
     borderTopColor: '#eee',
     paddingTop: 12,
   },
-  notesInput: {
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
-    padding: 12,
-    height: 60,
-    fontSize: 16,
-  },
+  // notesInput: {
+  //   borderWidth: 1,
+  //   borderColor: '#ddd',
+  //   borderRadius: 8,
+  //   padding: 12,
+  //   height: 60,
+  //   fontSize: 16,
+  // },
   dateButton: {
     backgroundColor: '#f3f4f6',
     padding: 12,
@@ -607,9 +603,9 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: '600',
   },
-  notesContainer: {
-    marginVertical: 12,
-  },
+  // notesContainer: {
+  //   marginVertical: 12,
+  // },
   notesIcon: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -636,11 +632,11 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     fontSize: 16,
   },
-  notesInputContainer: {
-    overflow: 'hidden',
-    borderColor: '#ddd',
-    borderRadius: 8,
-  },
+  // notesInputContainer: {
+  //   overflow: 'hidden',
+  //   borderColor: '#ddd',
+  //   borderRadius: 8,
+  // },
   loadingContainer: {
     padding: 20,
     alignItems: 'center',
@@ -672,6 +668,45 @@ const styles = StyleSheet.create({
     borderColor: '#ddd',
     borderRadius: 8,
     marginHorizontal: 4,
+  },
+  notesContainer: {
+    marginVertical: 16,
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#e5e5e5',
+  },
+  notesHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 16,
+  },
+  notesSectionTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#000',
+  },
+  notesToggleButton: {
+    padding: 4,
+  },
+  notesContentContainer: {
+    overflow: 'hidden',
+    paddingHorizontal: 16,
+  },
+  notesInput: {
+    backgroundColor: '#f8f8f8',
+    borderRadius: 8,
+    padding: 12,
+    fontSize: 16,
+    height: 80,
+    textAlignVertical: 'top',
+  },
+  notesHelper: {
+    fontSize: 12,
+    color: '#666',
+    marginTop: 8,
+    textAlign: 'right',
   },
 });
 

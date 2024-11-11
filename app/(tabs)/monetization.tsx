@@ -174,38 +174,54 @@ const MonetizationScreen = () => {
       </ScrollView>
 
       <Modal
-        visible={showPaymentModal}
-        transparent={true}
-        animationType="slide"
-        onRequestClose={() => setShowPaymentModal(false)}
-      >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Select Payment Method</Text>
-            
-            <TouchableOpacity 
-              style={styles.paymentButton}
-              onPress={() => handlePaymentMethodSelect('paypal')}
-            >
-              <Text style={styles.paymentButtonText}>PayPal (US)</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity 
-              style={styles.paymentButton}
-              onPress={() => handlePaymentMethodSelect('wipay')}
-            >
-              <Text style={styles.paymentButtonText}>WiPay (TT)</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity 
-              style={styles.cancelButton}
-              onPress={() => setShowPaymentModal(false)}
-            >
-              <Text style={styles.cancelButtonText}>Cancel</Text>
-            </TouchableOpacity>
+  visible={showPaymentModal}
+  transparent={true}
+  animationType="slide"
+  onRequestClose={() => setShowPaymentModal(false)}
+>
+  <View style={styles.modalOverlay}>
+    <View style={styles.modalContent}>
+      <Text style={styles.modalTitle}>Select Payment Method</Text>
+      
+      <View style={styles.cardsContainer}>
+        {/* PayPal Card */}
+        <TouchableOpacity
+          style={styles.paymentCard}
+          onPress={() => handlePaymentMethodSelect('paypal')}
+        >
+          <View style={styles.cardChip} />
+          <Text style={styles.cardProvider}>PayPal</Text>
+          <Text style={styles.cardRegion}>(US)</Text>
+          <View style={styles.cardDecoration}>
+            <View style={styles.cardCircle1} />
+            <View style={styles.cardCircle2} />
           </View>
-        </View>
-      </Modal>
+        </TouchableOpacity>
+
+        {/* WiPay Card */}
+        <TouchableOpacity
+          style={[styles.paymentCard, styles.wipayCard]}
+          onPress={() => handlePaymentMethodSelect('wipay')}
+        >
+          <View style={styles.cardChip} />
+          <Text style={styles.cardProvider}>WiPay</Text>
+          <Text style={styles.cardRegion}>(TT)</Text>
+          <View style={styles.cardDecoration}>
+            <View style={styles.cardCircle1} />
+            <View style={styles.cardCircle2} />
+          </View>
+        </TouchableOpacity>
+      </View>
+
+      <TouchableOpacity
+        style={styles.cancelButton}
+        onPress={() => setShowPaymentModal(false)}
+      >
+        <Text style={styles.cancelButtonText}>Cancel</Text>
+      </TouchableOpacity>
+    </View>
+  </View>
+</Modal>
     </>
   );
 };
@@ -297,7 +313,7 @@ const styles = StyleSheet.create({
     color: '#4b5563',
   },
   upgradeButton: {
-    backgroundColor: '#4f46e5',
+    backgroundColor: 'black',
     margin: 16,
     padding: 16,
     borderRadius: 12,
@@ -317,19 +333,19 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  modalContent: {
-    backgroundColor: 'white',
-    borderRadius: 16,
-    padding: 24,
-    width: '80%',
-    alignItems: 'center',
-  },
-  modalTitle: {
-    fontSize: 20,
-    fontWeight: '700',
-    marginBottom: 24,
-    color: '#1a1a1a',
-  },
+  // modalContent: {
+  //   backgroundColor: 'white',
+  //   borderRadius: 16,
+  //   padding: 24,
+  //   width: '80%',
+  //   alignItems: 'center',
+  // },
+  // modalTitle: {
+  //   fontSize: 20,
+  //   fontWeight: '700',
+  //   marginBottom: 24,
+  //   color: '#1a1a1a',
+  // },
   paymentButton: {
     backgroundColor: '#4f46e5',
     padding: 16,
@@ -343,6 +359,87 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
   },
+  // cancelButton: {
+  //   padding: 16,
+  //   width: '100%',
+  //   alignItems: 'center',
+  // },
+  // cancelButtonText: {
+  //   color: '#6b7280',
+  //   fontSize: 16,
+  //   fontWeight: '600',
+  // },
+  modalContent: {
+    backgroundColor: 'white',
+    borderRadius: 16,
+    padding: 24,
+    width: '90%',
+    alignItems: 'center',
+  },
+  cardsContainer: {
+    width: '100%',
+    gap: 16,
+    marginBottom: 20,
+  },
+  paymentCard: {
+    height: 180,
+    backgroundColor: '#1f45fc',
+    borderRadius: 16,
+    padding: 20,
+    position: 'relative',
+    overflow: 'hidden',
+    elevation: 5,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+  },
+  wipayCard: {
+    backgroundColor: '#4f46e5',
+  },
+  cardChip: {
+    width: 45,
+    height: 35,
+    backgroundColor: '#ffd700',
+    borderRadius: 6,
+    marginBottom: 30,
+  },
+  cardProvider: {
+    color: 'white',
+    fontSize: 24,
+    fontWeight: '700',
+    marginBottom: 4,
+  },
+  cardRegion: {
+    color: 'rgba(255, 255, 255, 0.8)',
+    fontSize: 16,
+  },
+  cardDecoration: {
+    position: 'absolute',
+    right: -20,
+    bottom: -20,
+  },
+  cardCircle1: {
+    width: 150,
+    height: 150,
+    borderRadius: 75,
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+  },
+  cardCircle2: {
+    position: 'absolute',
+    top: 30,
+    left: 30,
+    width: 150,
+    height: 150,
+    borderRadius: 75,
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+  },
+  modalTitle: {
+    fontSize: 24,
+    fontWeight: '700',
+    marginBottom: 30,
+    color: '#1a1a1a',
+  },
   cancelButton: {
     padding: 16,
     width: '100%',
@@ -352,7 +449,7 @@ const styles = StyleSheet.create({
     color: '#6b7280',
     fontSize: 16,
     fontWeight: '600',
-  },
+  }
 });
 
 export default MonetizationScreen; 

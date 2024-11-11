@@ -82,7 +82,7 @@ const styles = StyleSheet.create({
     borderColor: '#e5e7eb',
   },
   cancelText: {
-    color: '#6b7280',
+    color: 'black',
     fontSize: 16,
     textAlign: 'center',
   },
