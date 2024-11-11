@@ -179,7 +179,7 @@ const SalesScreen = () => {
 
         {/* Items Sold List */}
         <View style={styles.salesContainer}>
-          <Text style={styles.sectionTitle}>Items Sold</Text>
+          <Text style={styles.sectionTitle}>Recent Sales</Text>
           {recentSales.length === 0 ? (
             <EmptyState
               icon="cart-outline"
@@ -187,17 +187,39 @@ const SalesScreen = () => {
               message="Record your first sale to start tracking your revenue"
             />
           ) : (
-            recentSales.map((sale) => (
-              <View key={sale.id} style={styles.saleItem}>
-                <View style={styles.saleHeader}>
-                  <View>
-                    <Text style={styles.productTitle}>{sale.product.title}</Text>
-                    <Text style={styles.soldText}>Sold: {sale.quantity_sold}</Text>
+            <View style={styles.salesList}>
+              {recentSales.map((sale) => (
+                <View key={sale.id} style={styles.saleItem}>
+                  <View style={styles.saleContent}>
+                    <View style={styles.saleMainInfo}>
+                      <Text style={styles.productTitle} numberOfLines={1}>
+                        {sale.product.title}
+                      </Text>
+                      <Text style={styles.salePrice}>${sale.sale_price.toFixed(2)}</Text>
+                    </View>
+                    
+                    <View style={styles.saleStats}>
+                      <View style={styles.statItem}>
+                        <Text style={styles.statLabel}>Quantity</Text>
+                        <Text style={styles.statValue}>{sale.quantity_sold}</Text>
+                      </View>
+                      <View style={styles.statDivider} />
+                      <View style={styles.statItem}>
+                        <Text style={styles.statLabel}>Unit Price</Text>
+                        <Text style={styles.statValue}>${(sale.sale_price / sale.quantity_sold).toFixed(2)}</Text>
+                      </View>
+                      <View style={styles.statDivider} />
+                      <View style={styles.statItem}>
+                        <Text style={styles.statLabel}>Date</Text>
+                        <Text style={styles.statValue}>
+                          {new Date(sale.sale_date).toLocaleDateString()}
+                        </Text>
+                      </View>
+                    </View>
                   </View>
-                  <Text style={styles.salePrice}>${sale.sale_price.toFixed(0)}</Text>
                 </View>
-              </View>
-            ))
+              ))}
+            </View>
           )}
         </View>
       </ScrollView>
@@ -317,35 +339,72 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   salesContainer: {
-    padding: 16,
+    padding: 24,
   },
   sectionTitle: {
-    fontSize: 18,
-    fontWeight: '600',
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#1a1a1a',
     marginBottom: 16,
   },
-  saleItem: {
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+  salesList: {
+    gap: 12,
   },
-  saleHeader: {
+  saleItem: {
+    backgroundColor: 'white',
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: '#f0f0f0',
+    overflow: 'hidden',
+  },
+  saleContent: {
+    padding: 16,
+  },
+  saleMainInfo: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    marginBottom: 12,
   },
   productTitle: {
     fontSize: 16,
-    fontWeight: '500',
-    marginBottom: 4,
-  },
-  soldText: {
-    fontSize: 14,
-    color: '#666',
+    fontWeight: '600',
+    color: '#1f2937',
+    flex: 1,
+    marginRight: 12,
   },
   salePrice: {
-    fontSize: 16,
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#1a1a1a',
+  },
+  saleStats: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#f8f9fa',
+    borderRadius: 12,
+    padding: 12,
+  },
+  statItem: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  statLabel: {
+    fontSize: 12,
+    color: '#6b7280',
+    marginBottom: 4,
+  },
+  statValue: {
+    fontSize: 14,
     fontWeight: '600',
+    color: '#374151',
+  },
+  statDivider: {
+    width: 1,
+    height: 24,
+    backgroundColor: '#e5e7eb',
+    marginHorizontal: 8,
   },
   revenueRow: {
     flexDirection: 'row',

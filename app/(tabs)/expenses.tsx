@@ -272,25 +272,61 @@ const ExpenseScreen = () => {
   return (
     <SafeAreaView style={styles.container}>
       {isLoading && <ActivityIndicator size="large" color="#000" />}
-      {/* Update Header */}
+      
+      {/* Modern Header */}
       <View style={styles.header}>
-        <Text style={styles.title}>Expenses</Text>
-        <View style={styles.headerButtons}>
-          <TouchableOpacity
-            style={styles.iconButton}
-            onPress={() => setFilterVisible(true)}
-          >
-            <Ionicons name="filter-outline" size={24} color="#000" />
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.addButton}
-            onPress={() => setShowAddModal(true)}
-          >
-            <Ionicons name="add" size={24} color="#fff" />
-          </TouchableOpacity>
+        <View style={styles.headerTop}>
+          <Text style={styles.headerTitle}>Expenses</Text>
+          <View style={styles.headerButtons}>
+            <TouchableOpacity
+              style={styles.iconButton}
+              onPress={() => setFilterVisible(true)}
+            >
+              <Ionicons name="funnel-outline" size={22} color="#666" />
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.addButton}
+              onPress={() => setShowAddModal(true)}
+            >
+              <Text style={styles.addButtonText}>+ Add Expense</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        {/* Total Expenses Card */}
+        <View style={styles.totalCard}>
+          <Text style={styles.totalLabel}>Total Expenses</Text>
+          <View style={styles.totalRow}>
+            <Text style={styles.totalAmount}>
+              {formatCurrency(getTotalExpenses())}
+            </Text>
+            <LineChart
+              data={{
+                datasets: [{
+                  data: [5000, 6000, 5500, 7000, 6500, 8000, 7500]
+                }]
+              }}
+              width={100}
+              height={40}
+              withDots={false}
+              withInnerLines={false}
+              withOuterLines={false}
+              withVerticalLabels={false}
+              withHorizontalLabels={false}
+              chartConfig={{
+                backgroundGradientFrom: '#f8f9fa',
+                backgroundGradientTo: '#f8f9fa',
+                color: (opacity = 1) => `rgba(79, 70, 229, ${opacity})`,
+                strokeWidth: 2,
+              }}
+              bezier
+              style={styles.miniChart}
+            />
+          </View>
         </View>
       </View>
 
+      {/* Modern Tab Bar */}
       <View style={styles.tabBar}>
         {['expenses', 'budget', 'analytics', 'reports'].map((tab) => (
           <TouchableOpacity
@@ -306,52 +342,48 @@ const ExpenseScreen = () => {
       </View>
 
       {activeTab === 'expenses' && (
-        <>
-          {/* Total Expenses Card */}
-          <View style={styles.totalCard}>
-            <Text style={styles.totalLabel}>Total Expenses</Text>
-            <Text style={styles.totalAmount}>
-              {formatCurrency(getTotalExpenses())}
-            </Text>
-          </View>
-
+        <ScrollView style={styles.mainContent}>
           {/* Time Frame Selector */}
           <View style={styles.timeFrameSelector}>
-            <TouchableOpacity 
-              style={[styles.timeFrameButton, timeFrame === 'daily' && styles.activeTimeFrame]}
-              onPress={() => setTimeFrame('daily')}
-            >
-              <Text style={[styles.timeFrameText, timeFrame === 'daily' && styles.activeTimeFrameText]}>
-                Daily
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity 
-              style={[styles.timeFrameButton, timeFrame === 'weekly' && styles.activeTimeFrame]}
-              onPress={() => setTimeFrame('weekly')}
-            >
-              <Text style={[styles.timeFrameText, timeFrame === 'weekly' && styles.activeTimeFrameText]}>
-                Weekly
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity 
-              style={[styles.timeFrameButton, timeFrame === 'monthly' && styles.activeTimeFrame]}
-              onPress={() => setTimeFrame('monthly')}
-            >
-              <Text style={[styles.timeFrameText, timeFrame === 'monthly' && styles.activeTimeFrameText]}>
-                Monthly
-              </Text>
-            </TouchableOpacity>
+            {['daily', 'weekly', 'monthly'].map((period) => (
+              <TouchableOpacity 
+                key={period}
+                style={[
+                  styles.timeFrameButton, 
+                  timeFrame === period && styles.activeTimeFrame
+                ]}
+                onPress={() => setTimeFrame(period as typeof timeFrame)}
+              >
+                <Text style={[
+                  styles.timeFrameText, 
+                  timeFrame === period && styles.activeTimeFrameText
+                ]}>
+                  {period.charAt(0).toUpperCase() + period.slice(1)}
+                </Text>
+              </TouchableOpacity>
+            ))}
           </View>
 
           {/* Summary Cards */}
           <View style={styles.summaryContainer}>
-            <View style={styles.summaryCard}>
-              <Text style={styles.summaryLabel}>
-                {timeFrame === 'daily' ? 'Today' : timeFrame === 'weekly' ? 'This Week' : 'This Month'}
-              </Text>
-              <Text style={styles.summaryAmount}>
-                ${summary[timeFrame].toFixed(2)}
-              </Text>
+            <View style={styles.summaryRow}>
+              <View style={styles.summaryCard}>
+                <Text style={styles.summaryLabel}>
+                  {timeFrame === 'daily' ? 'Today' : 
+                   timeFrame === 'weekly' ? 'This Week' : 'This Month'}
+                </Text>
+                <Text style={styles.summaryAmount}>
+                  ${summary[timeFrame].toFixed(2)}
+                </Text>
+                <Text style={styles.summaryChange}>+12.5%</Text>
+              </View>
+              <View style={styles.summaryCard}>
+                <Text style={styles.summaryLabel}>Average Daily</Text>
+                <Text style={styles.summaryAmount}>
+                  ${(summary[timeFrame] / 30).toFixed(2)}
+                </Text>
+                <Text style={styles.summaryChange}>-3.2%</Text>
+              </View>
             </View>
           </View>
 
@@ -382,43 +414,64 @@ const ExpenseScreen = () => {
           </View>
 
           {/* Expenses List */}
-          <ScrollView
-            style={styles.expensesList}
-            contentContainerStyle={styles.expensesListContent}
-            refreshControl={
-              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-            }
-          >
-            {expenses.map((expense) => (
-              <Animated.View
-                key={expense.id}
-                style={styles.expenseItem}
-                entering={FadeIn}
-                layout={Layout.springify()}
-              >
-                <View style={styles.expenseHeader}>
-                  <Text style={styles.expenseDescription}>
-                    {expense.description}
-                  </Text>
-                  <Text style={styles.expenseAmount}>
-                    {formatCurrency(expense.amount)}
-                  </Text>
-                </View>
-                <View style={styles.expenseDetails}>
-                  <View style={styles.categoryTag}>
-                    <Text style={styles.categoryText}>{expense.category}</Text>
-                  </View>
-                  <Text style={styles.expenseDate}>
-                    {formatDate(expense.date)}
-                  </Text>
-                </View>
-                {expense.notes && (
-                  <Text style={styles.expenseNotes}>{expense.notes}</Text>
-                )}
-              </Animated.View>
-            ))}
-          </ScrollView>
-        </>
+          <View style={styles.expensesContainer}>
+            <Text style={styles.sectionTitle}>Recent Expenses</Text>
+            {expenses.length === 0 ? (
+              <EmptyState
+                icon="wallet-outline"
+                title="No Expenses Yet"
+                message="Add your first expense to start tracking your spending"
+              />
+            ) : (
+              <View style={styles.expensesList}>
+                {expenses.map((expense) => (
+                  <Animated.View
+                    key={expense.id}
+                    style={styles.expenseItem}
+                    entering={FadeIn}
+                    layout={Layout.springify()}
+                  >
+                    <View style={styles.expenseContent}>
+                      <View style={styles.expenseMainInfo}>
+                        <Text style={styles.expenseDescription} numberOfLines={1}>
+                          {expense.description}
+                        </Text>
+                        <Text style={styles.expenseAmount}>
+                          ${expense.amount.toFixed(2)}
+                        </Text>
+                      </View>
+                      
+                      <View style={styles.expenseStats}>
+                        <View style={styles.statItem}>
+                          <Text style={styles.statLabel}>Category</Text>
+                          <Text style={styles.statValue}>{expense.category}</Text>
+                        </View>
+                        <View style={styles.statDivider} />
+                        <View style={styles.statItem}>
+                          <Text style={styles.statLabel}>Date</Text>
+                          <Text style={styles.statValue}>
+                            {formatDate(expense.date)}
+                          </Text>
+                        </View>
+                        {expense.notes && (
+                          <>
+                            <View style={styles.statDivider} />
+                            <View style={styles.statItem}>
+                              <Text style={styles.statLabel}>Notes</Text>
+                              <Text style={styles.statValue} numberOfLines={1}>
+                                {expense.notes}
+                              </Text>
+                            </View>
+                          </>
+                        )}
+                      </View>
+                    </View>
+                  </Animated.View>
+                ))}
+              </View>
+            )}
+          </View>
+        </ScrollView>
       )}
       {activeTab === 'budget' && <BudgetManager />}
       {activeTab === 'analytics' && <ExpenseAnalytics />}
@@ -447,157 +500,153 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   header: {
+    padding: 24,
+    backgroundColor: '#fff',
+  },
+  headerTop: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: 16,
-    backgroundColor: '#fff',
+    marginBottom: 24,
   },
-  title: {
-    fontSize: 24,
-    fontWeight: '600',
+  headerTitle: {
+    fontSize: 32,
+    fontWeight: '700',
+    color: '#1a1a1a',
+  },
+  headerButtons: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  iconButton: {
+    padding: 8,
+    backgroundColor: '#f3f4f6',
+    borderRadius: 8,
   },
   addButton: {
-    backgroundColor: '#000',
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: 'black',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 8,
+  },
+  addButtonText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '600',
   },
   totalCard: {
-    margin: 20,
-    padding: 20,
     backgroundColor: '#f8f9fa',
-    borderRadius: 12,
+    padding: 24,
+    borderRadius: 16,
     borderWidth: 1,
-    borderColor: '#eee',
+    borderColor: '#f0f0f0',
+  },
+  totalRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
   totalLabel: {
-    fontSize: 16,
+    fontSize: 15,
     color: '#666',
     marginBottom: 8,
+    fontWeight: '500',
   },
   totalAmount: {
-    fontSize: 32,
-    fontWeight: '600',
+    fontSize: 36,
+    fontWeight: '700',
+    color: '#1a1a1a',
   },
-  expensesList: {
+  miniChart: {
+    marginRight: -16,
+  },
+  mainContent: {
     flex: 1,
-    padding: 10,
-  },
-  expenseItem: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
-    borderWidth: 1,
-    borderColor: '#eee',
-  },
-  expenseHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  expenseDescription: {
-    fontSize: 16,
-    fontWeight: '500',
-    flex: 1,
-    marginRight: 8,
-  },
-  expenseAmount: {
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  expenseDetails: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  categoryTag: {
-    backgroundColor: '#f3f4f6',
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-    borderRadius: 16,
-  },
-  categoryText: {
-    color: '#666',
-    fontSize: 14,
-  },
-  expenseDate: {
-    color: '#666',
-    fontSize: 14,
-  },
-  expenseNotes: {
-    marginTop: 8,
-    color: '#666',
-    fontSize: 14,
   },
   timeFrameSelector: {
     flexDirection: 'row',
-    padding: 20,
+    padding: 24,
     justifyContent: 'center',
     gap: 8,
   },
   timeFrameButton: {
     paddingHorizontal: 16,
     paddingVertical: 8,
-    borderRadius: 20,
+    borderRadius: 8,
     backgroundColor: '#f3f4f6',
   },
   activeTimeFrame: {
-    backgroundColor: '#000',
+    backgroundColor: 'black',
   },
   timeFrameText: {
     color: '#666',
     fontWeight: '500',
+    fontSize: 14,
   },
   activeTimeFrameText: {
     color: '#fff',
   },
   summaryContainer: {
-    padding: 20,
+    padding: 24,
+  },
+  summaryRow: {
+    flexDirection: 'row',
+    gap: 12,
   },
   summaryCard: {
-    backgroundColor: '#f8f9fa',
+    flex: 1,
+    backgroundColor: '#fff',
+    padding: 16,
     borderRadius: 12,
-    padding: 20,
     borderWidth: 1,
-    borderColor: '#eee',
+    borderColor: '#f0f0f0',
   },
   summaryLabel: {
-    fontSize: 16,
+    fontSize: 14,
     color: '#666',
-    marginBottom: 8,
+    marginBottom: 4,
   },
   summaryAmount: {
-    fontSize: 32,
-    fontWeight: '600',
+    fontSize: 24,
+    fontWeight: '700',
+    color: '#1a1a1a',
+    marginBottom: 4,
+  },
+  summaryChange: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#16a34a',
   },
   categoryBreakdown: {
-    padding: 20,
+    padding: 24,
   },
   sectionTitle: {
     fontSize: 18,
     fontWeight: '600',
-    marginBottom: 12,
+    color: '#1a1a1a',
+    marginBottom: 16,
+  },
+  categoryContainer: {
+    paddingRight: 24,
+    gap: 12,
   },
   categoryCard: {
     backgroundColor: '#fff',
     borderRadius: 12,
     padding: 16,
-    marginRight: 12,
-    borderLeftWidth: 4,
-    minWidth: 140,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 2,
+    borderWidth: 1,
+    borderColor: '#f0f0f0',
+    minWidth: 150,
+  },
+  categoryIcon: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: '#f3f4f6',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 12,
   },
   categoryName: {
     fontSize: 14,
@@ -607,6 +656,68 @@ const styles = StyleSheet.create({
   categoryAmount: {
     fontSize: 18,
     fontWeight: '600',
+    color: '#1a1a1a',
+    marginBottom: 4,
+  },
+  categoryPercentage: {
+    fontSize: 14,
+    color: '#666',
+  },
+  expensesSection: {
+    padding: 24,
+  },
+  expenseItem: {
+    backgroundColor: 'white',
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: '#f0f0f0',
+    overflow: 'hidden',
+  },
+  expenseMain: {
+    gap: 12,
+  },
+  expenseInfo: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  expenseDescription: {
+    fontSize: 16,
+    fontWeight: '500',
+    color: '#1a1a1a',
+    flex: 1,
+    marginRight: 12,
+  },
+  expenseAmount: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#1a1a1a',
+  },
+  expenseDetails: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  categoryTag: {
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    borderRadius: 16,
+    backgroundColor: '#f3f4f6',
+  },
+  categoryTagText: {
+    fontSize: 12,
+    fontWeight: '500',
+    color: '#fff',
+  },
+  expenseDate: {
+    fontSize: 14,
+    color: '#666',
+  },
+  expenseNotes: {
+    marginTop: 8,
+    fontSize: 14,
+    color: '#666',
+    fontStyle: 'italic',
   },
   filterModal: {
     flex: 1,
@@ -671,14 +782,6 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: '600',
   },
-  headerButtons: {
-    flexDirection: 'row',
-    gap: 12,
-    alignItems: 'center',
-  },
-  iconButton: {
-    padding: 8,
-  },
   emptyCategory: {
     padding: 16,
     backgroundColor: '#f3f4f6',
@@ -718,6 +821,83 @@ const styles = StyleSheet.create({
   },
   expensesListContent: {
     paddingBottom: 20,
+  },
+  expensesList: {
+    gap: 12,
+  },
+  expenseHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  expensesContainer: {
+    padding: 24,
+  },
+  sectionTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#1a1a1a',
+    marginBottom: 16,
+  },
+  expensesList: {
+    gap: 12,
+  },
+  expenseItem: {
+    backgroundColor: 'white',
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: '#f0f0f0',
+    overflow: 'hidden',
+  },
+  expenseContent: {
+    padding: 16,
+  },
+  expenseMainInfo: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  expenseDescription: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#1f2937',
+    flex: 1,
+    marginRight: 12,
+  },
+  expenseAmount: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#1a1a1a',
+  },
+  expenseStats: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#f8f9fa',
+    borderRadius: 12,
+    padding: 12,
+  },
+  statItem: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  statLabel: {
+    fontSize: 12,
+    color: '#6b7280',
+    marginBottom: 4,
+  },
+  statValue: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#374151',
+  },
+  statDivider: {
+    width: 1,
+    height: 24,
+    backgroundColor: '#e5e7eb',
+    marginHorizontal: 8,
   },
 });
 

@@ -17,22 +17,28 @@ const ListItem = ({ item, onPress }: { item: Product; onPress: () => void }) => 
   return (
     <TouchableOpacity onPress={onPress} style={styles.listItem}>
       <View style={styles.leftContent}>
-        <View style={styles.titleContainer}>
-          <Text style={styles.itemTitle}>{item.title}</Text>
-          {/* <TouchableOpacity onPress={handleEllipsisPress} style={styles.ellipsisButton}>
-            <Ionicons name="ellipsis-horizontal-outline" size={20} color="black" />
-          </TouchableOpacity> */}
-        </View>
-        <Text style={styles.itemPrice}>${item.price.toFixed(2)} · {item.quantity} QTY</Text>
-        <View style={styles.detailsWrapper}>
-          <Text style={styles.detailsButton}>Details</Text>
+        <Text style={styles.itemTitle} numberOfLines={1}>
+          {item.title}
+        </Text>
+        <View style={styles.statsContainer}>
+          <View style={styles.statItem}>
+            <Text style={styles.statLabel}>Price</Text>
+            <Text style={styles.statValue}>${item.price.toFixed(2)}</Text>
+          </View>
+          <View style={styles.statDivider} />
+          <View style={styles.statItem}>
+            <Text style={styles.statLabel}>Quantity</Text>
+            <Text style={styles.statValue}>{item.quantity}</Text>
+          </View>
         </View>
       </View>
       <View style={styles.imageContainer}>
         {item.image_url ? (
           <Image source={{ uri: item.image_url }} style={styles.image} />
         ) : (
-          <View style={styles.image} />
+          <View style={[styles.image, styles.placeholderImage]}>
+            <Ionicons name="image-outline" size={24} color="#9ca3af" />
+          </View>
         )}
       </View>
     </TouchableOpacity>
@@ -140,49 +146,63 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 16,
-    paddingHorizontal: 12,
-    borderWidth: 1,
-    borderColor: '#e5e7eb85',
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    backgroundColor: 'white',
     borderRadius: 12,
     marginBottom: 8,
+    borderWidth: 1,
+    borderColor: '#f3f4f6',
   },
   leftContent: {
-    gap: 4,
+    flex: 1,
+    marginRight: 12,
+    gap: 8,
   },
   itemTitle: {
     fontSize: 16,
-    fontWeight: '700',
+    fontWeight: '600',
+    color: '#1f2937',
+    marginBottom: 4,
   },
-  ellipsisButton: {
-    padding: 4,  // Add some padding for better touch target
+  statsContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
-  itemPrice: {
-    fontSize: 14,
+  statItem: {
+    flex: 1,
+  },
+  statLabel: {
+    fontSize: 12,
     color: '#6b7280',
+    marginBottom: 2,
   },
-  detailsWrapper: {
-    backgroundColor: '#efefef',
-    alignSelf: 'flex-start',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 6,
-    marginTop: 8,
+  statValue: {
+    fontSize: 15,
+    fontWeight: '500',
+    color: '#374151',
   },
-  detailsButton: {
-    fontSize: 14,
-    color: 'black',
+  statDivider: {
+    width: 1,
+    height: 24,
+    backgroundColor: '#e5e7eb',
+    marginHorizontal: 12,
   },
   imageContainer: {
-    width: 80,
-    height: 80,
+    width: 64,
+    height: 64,
     borderRadius: 8,
     overflow: 'hidden',
+    backgroundColor: '#f3f4f6',
   },
   image: {
-    backgroundColor: '#f3f4f6',
     width: '100%',
     height: '100%',
+    resizeMode: 'cover',
+  },
+  placeholderImage: {
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   sectionTitle: {
     fontSize: 20,
