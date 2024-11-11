@@ -621,12 +621,12 @@ const styles = StyleSheet.create({
   categoryBreakdown: {
     padding: 24,
   },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#1a1a1a',
-    marginBottom: 16,
-  },
+  // sectionTitle: {
+  //   fontSize: 18,
+  //   fontWeight: '600',
+  //   color: '#1a1a1a',
+  //   marginBottom: 16,
+  // },
   categoryContainer: {
     paddingRight: 24,
     gap: 12,
@@ -666,13 +666,13 @@ const styles = StyleSheet.create({
   expensesSection: {
     padding: 24,
   },
-  expenseItem: {
-    backgroundColor: 'white',
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: '#f0f0f0',
-    overflow: 'hidden',
-  },
+  // expenseItem: {
+  //   backgroundColor: 'white',
+  //   borderRadius: 16,
+  //   borderWidth: 1,
+  //   borderColor: '#f0f0f0',
+  //   overflow: 'hidden',
+  // },
   expenseMain: {
     gap: 12,
   },
@@ -681,18 +681,18 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
-  expenseDescription: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: '#1a1a1a',
-    flex: 1,
-    marginRight: 12,
-  },
-  expenseAmount: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#1a1a1a',
-  },
+  // expenseDescription: {
+  //   fontSize: 16,
+  //   fontWeight: '500',
+  //   color: '#1a1a1a',
+  //   flex: 1,
+  //   marginRight: 12,
+  // },
+  // expenseAmount: {
+  //   fontSize: 16,
+  //   fontWeight: '600',
+  //   color: '#1a1a1a',
+  // },
   expenseDetails: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -822,9 +822,9 @@ const styles = StyleSheet.create({
   expensesListContent: {
     paddingBottom: 20,
   },
-  expensesList: {
-    gap: 12,
-  },
+  // expensesList: {
+  //   gap: 12,
+  // },
   expenseHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
