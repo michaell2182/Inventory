@@ -14,8 +14,9 @@ import {
 import { supabase } from "../../lib/supabase";
 import { Ionicons } from '@expo/vector-icons';
 
-const TEST_EMAIL = "test@example.com";
-const TEST_PASSWORD = "testpassword123";
+// Test credentials temporarily disabled for production
+// const TEST_EMAIL = "test@example.com";
+// const TEST_PASSWORD = "testpassword123";
 
 const AuthScreen = () => {
   const [email, setEmail] = useState("");
@@ -66,10 +67,9 @@ const AuthScreen = () => {
   
 
   const handleTestLogin = async () => {
-    setEmail(TEST_EMAIL);
-    setPassword(TEST_PASSWORD);
+    // Entire function commented out since test credentials are disabled
+    /*
     setLoading(true);
-    
     try {
       const { error } = await supabase.auth.signInWithPassword({
         email: TEST_EMAIL,
@@ -78,10 +78,10 @@ const AuthScreen = () => {
       if (error) throw error;
     } catch (error: any) {
       Alert.alert("Error", "Test account not found. Please create it first.");
-      // Optionally create the test account here if it doesn't exist
     } finally {
       setLoading(false);
     }
+    */
   };
 
   return (
@@ -152,13 +152,16 @@ const AuthScreen = () => {
           </View>
 
           {isLogin && (
-            <TouchableOpacity
-              style={[styles.testButton, loading && styles.buttonDisabled]}
-              onPress={handleTestLogin}
-              disabled={loading}
-            >
-              <Text style={styles.testButtonText}>Use Test Account</Text>
-            </TouchableOpacity>
+            /* Test account button temporarily disabled for production
+              <TouchableOpacity
+                style={[styles.testButton, loading && styles.buttonDisabled]}
+                onPress={handleTestLogin}
+                disabled={loading}
+              >
+                <Text style={styles.testButtonText}>Use Test Account</Text>
+              </TouchableOpacity>
+            */
+              null
           )}
 
           <TouchableOpacity
