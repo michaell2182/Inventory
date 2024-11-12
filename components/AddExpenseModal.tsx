@@ -80,6 +80,12 @@ const AddExpenseModal = ({ visible, onClose, onExpenseAdded }: AddExpenseModalPr
 
     setIsLoading(true);
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        throw new Error('No authenticated user');
+      }
+
       const { data, error } = await supabase
         .from('expenses')
         .insert({
@@ -88,6 +94,7 @@ const AddExpenseModal = ({ visible, onClose, onExpenseAdded }: AddExpenseModalPr
           category,
           date: date.toISOString(),
           notes,
+          user_id: user.id,
         })
         .select()
         .single();

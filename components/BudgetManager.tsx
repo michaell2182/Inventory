@@ -28,23 +28,38 @@ const BudgetManager = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    const checkUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        console.error('No user signed in');
+      }
+    };
+    
+    checkUser();
+  }, []);
+
+  useEffect(() => {
     fetchBudgets();
   }, []);
 
   const fetchBudgets = async () => {
     try {
-      setIsLoading(true);
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        throw new Error('No authenticated user');
+      }
+
       const { data, error } = await supabase
         .from('budgets')
         .select('*')
-        .order('category');
+        .eq('user_id', user.id);
 
       if (error) throw error;
       setBudgets(data || []);
     } catch (error) {
       console.error('Error fetching budgets:', error);
-    } finally {
-      setIsLoading(false);
+      throw error;
     }
   };
 
@@ -56,6 +71,32 @@ const BudgetManager = () => {
     if (progress >= 90) return '#dc2626';
     if (progress >= 75) return '#f59e0b';
     return '#16a34a';
+  };
+
+  const createBudget = async (budgetData: Budget) => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        throw new Error('No authenticated user');
+      }
+
+      const { data, error } = await supabase
+        .from('budgets')
+        .insert({
+          ...budgetData,
+          user_id: user.id,
+        })
+        .select();
+
+      if (error) throw error;
+      
+      console.log('Budget created:', data);
+      return data;
+    } catch (error) {
+      console.error('Error creating budget:', error);
+      throw error;
+    }
   };
 
   return (

@@ -121,9 +121,18 @@ const ExpenseScreen = () => {
   const fetchExpenses = useCallback(async () => {
     try {
       setIsLoading(true);
+      
+      // Get current user
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        throw new Error('No authenticated user');
+      }
+
       const { data, error } = await supabase
         .from('expenses')
         .select('*')
+        .eq('user_id', user.id) // Filter by user_id
         .order('date', { ascending: false });
 
       if (error) throw error;
@@ -638,6 +647,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#f0f0f0',
     minWidth: 150,
+    
   },
   categoryIcon: {
     width: 36,

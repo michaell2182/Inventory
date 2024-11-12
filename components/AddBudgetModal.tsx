@@ -43,6 +43,12 @@ const AddBudgetModal = ({ visible, onClose, onBudgetAdded }: AddBudgetModalProps
     }
 
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        throw new Error('No authenticated user');
+      }
+
       const budgetData = {
         category,
         budget_limit: parseFloat(limit),
@@ -50,6 +56,7 @@ const AddBudgetModal = ({ visible, onClose, onBudgetAdded }: AddBudgetModalProps
         notifications,
         notes,
         spent: 0,
+        user_id: user.id,
       };
       console.log('Attempting to insert budget:', budgetData);
 
@@ -66,6 +73,7 @@ const AddBudgetModal = ({ visible, onClose, onBudgetAdded }: AddBudgetModalProps
 
       console.log('Successfully added budget:', data);
       onBudgetAdded();
+      resetForm();
       onClose();
     } catch (error) {
       console.error('Detailed error:', {
@@ -77,6 +85,14 @@ const AddBudgetModal = ({ visible, onClose, onBudgetAdded }: AddBudgetModalProps
       });
       alert('Error adding budget. Please check console for details.');
     }
+  };
+
+  const resetForm = () => {
+    setCategory('');
+    setLimit('');
+    setPeriod('monthly');
+    setNotifications(true);
+    setNotes('');
   };
 
   return (
