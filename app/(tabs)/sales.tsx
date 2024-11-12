@@ -52,6 +52,14 @@ const SalesScreen = () => {
 
   const fetchSalesData = async () => {
     try {
+      // Get the current user's ID
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        console.error('No user logged in');
+        return;
+      }
+
       // Fetch sales records with product details
       const { data: sales, error } = await supabase
         .from('sales')
@@ -59,6 +67,7 @@ const SalesScreen = () => {
           *,
           product:products(title, price)
         `)
+        .eq('user_id', user.id)
         .order('sale_date', { ascending: false });
 
       if (error) throw error;
