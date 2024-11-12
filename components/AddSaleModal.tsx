@@ -45,7 +45,7 @@ interface AddSaleModalProps {
 const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity);
 
 const AddSaleModal = ({ visible, onClose, onSaleComplete }: AddSaleModalProps) => {
-  const { state: { products } } = useInventory();
+  const { state: { products }, dispatch } = useInventory();
   const [selectedProducts, setSelectedProducts] = useState<SelectedProduct[]>([]);
   const [notes, setNotes] = useState('');
   const [saleDate, setSaleDate] = useState(new Date());
@@ -184,21 +184,30 @@ const AddSaleModal = ({ visible, onClose, onSaleComplete }: AddSaleModalProps) =
 
     setIsLoading(true);
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        throw new Error('No authenticated user');
+      }
+
       // Record each product sale
       for (const item of selectedProducts) {
+        const saleData = {
+          product_id: item.product.id,
+          quantity_sold: parseInt(item.quantity),
+          sale_price: item.product.price * parseInt(item.quantity),
+          sale_date: saleDate.toISOString(),
+          notes: notes,
+          user_id: user.id,
+        };
+
         const { error: saleError } = await supabase
           .from('sales')
-          .insert({
-            product_id: item.product.id,
-            quantity_sold: parseInt(item.quantity),
-            sale_price: item.product.price * parseInt(item.quantity),
-            sale_date: saleDate.toISOString(),
-            notes: notes,
-          });
+          .insert([saleData]);
 
         if (saleError) throw saleError;
 
-        // Update product quantity
+        // Update product quantity in Supabase
         const newQuantity = item.product.quantity - parseInt(item.quantity);
         const { error: updateError } = await supabase
           .from('products')
@@ -206,28 +215,37 @@ const AddSaleModal = ({ visible, onClose, onSaleComplete }: AddSaleModalProps) =
           .eq('id', item.product.id);
 
         if (updateError) throw updateError;
+
+        // Update local inventory state
+        dispatch({
+          type: 'UPDATE_PRODUCT',
+          payload: {
+            ...item.product,
+            quantity: newQuantity
+          }
+        });
       }
 
-      // After successfully creating the sale, check stock levels
-      const product = products.find(product => product.id === selectedProducts[0].product.id);
-      if (!product) return;
-
-      const updatedProduct = {
-        ...product,
-        quantity: product.quantity - parseInt(selectedProducts[0].quantity)
-      };
-      
-      await checkAndNotifyLowStock(updatedProduct);
+      // Check stock levels
+      for (const item of selectedProducts) {
+        const product = products.find(p => p.id === item.product.id);
+        if (product) {
+          const updatedProduct = {
+            ...product,
+            quantity: product.quantity - parseInt(item.quantity)
+          };
+          await checkAndNotifyLowStock(updatedProduct);
+        }
+      }
 
       onSaleComplete();
       onClose();
-      // Reset form
       setSelectedProducts([]);
       setNotes('');
       setSaleDate(new Date());
     } catch (error) {
       console.error('Error recording sale:', error);
-      alert('Error recording sale');
+      Alert.alert('Error', 'Failed to record sale');
     } finally {
       setIsLoading(false);
     }

@@ -68,6 +68,7 @@ type InventoryContextType = {
   updateProduct: (id: string, updates: Partial<Product>) => Promise<void>;
   deleteProduct: (id: string) => Promise<void>;
   fetchProducts: () => Promise<void>;
+  dispatch: React.Dispatch<any>;
 };
 
 const InventoryContext = createContext<InventoryContextType | undefined>(undefined);
@@ -227,7 +228,8 @@ export function InventoryProvider({ children }: { children: React.ReactNode }) {
       addProduct,
       updateProduct,
       deleteProduct,
-      fetchProducts
+      fetchProducts,
+      dispatch
     }}>
       {children}
     </InventoryContext.Provider>

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, ScrollView, StyleSheet, TouchableOpacity, SafeAreaView } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, TouchableOpacity, SafeAreaView, Alert } from 'react-native';
 import { supabase } from '../../lib/supabase';
 import { LineChart } from 'react-native-chart-kit';
 import { Dimensions } from 'react-native';
@@ -56,11 +56,10 @@ const SalesScreen = () => {
       const { data: { user } } = await supabase.auth.getUser();
       
       if (!user) {
-        console.error('No user logged in');
-        return;
+        throw new Error('No authenticated user');
       }
 
-      // Fetch sales records with product details
+      // Fetch sales records with product details, filtered by user_id
       const { data: sales, error } = await supabase
         .from('sales')
         .select(`
@@ -81,13 +80,14 @@ const SalesScreen = () => {
         
         setMetrics({
           totalSales,
-          averageSale: totalSales / sales.length || 0,
+          averageSale: sales.length > 0 ? totalSales / sales.length : 0,
           totalItemsSold: totalItems,
-          averageItemsPerSale: totalItems / sales.length || 0,
+          averageItemsPerSale: sales.length > 0 ? totalItems / sales.length : 0,
         });
       }
     } catch (error) {
       console.error('Error fetching sales:', error);
+      Alert.alert('Error', 'Failed to fetch sales data');
     } finally {
       setIsLoading(false);
     }
