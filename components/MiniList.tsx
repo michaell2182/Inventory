@@ -57,7 +57,7 @@ const EmptyState = () => (
       </View>
       <Text style={styles.emptyStateTitle}>No Products Yet</Text>
       <Text style={styles.emptyStateText}>
-        Your inventory list is empty. Add your first product to get started.
+        Your inventory list is empty. Add your first product by clicking on the camera icon.
       </Text>
     </View>
   </View>
@@ -75,8 +75,9 @@ const MiniList = () => {
     }, [])
   );
 
-  // Limit to 5 most recent products, sorted by date
+  // Filter active products and limit to 5 most recent
   const limitedProducts = products
+    .filter(product => product.is_active)
     .sort((a, b) => new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime())
     .slice(0, 5);
 

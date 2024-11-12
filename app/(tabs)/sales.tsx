@@ -64,7 +64,7 @@ const SalesScreen = () => {
         .from('sales')
         .select(`
           *,
-          product:products(title, price)
+          product:products(title, price, is_active)
         `)
         .eq('user_id', user.id)
         .order('sale_date', { ascending: false });
@@ -72,17 +72,19 @@ const SalesScreen = () => {
       if (error) throw error;
 
       if (sales) {
-        setRecentSales(sales);
+        // Filter out sales with inactive products or mark them differently
+        const activeSales = sales.filter(sale => sale.product.is_active);
+        setRecentSales(activeSales);
         
-        // Calculate metrics
-        const totalSales = sales.reduce((sum, sale) => sum + sale.sale_price, 0);
-        const totalItems = sales.reduce((sum, sale) => sum + sale.quantity_sold, 0);
+        // Calculate metrics only for active products
+        const totalSales = activeSales.reduce((sum, sale) => sum + sale.sale_price, 0);
+        const totalItems = activeSales.reduce((sum, sale) => sum + sale.quantity_sold, 0);
         
         setMetrics({
           totalSales,
-          averageSale: sales.length > 0 ? totalSales / sales.length : 0,
+          averageSale: activeSales.length > 0 ? totalSales / activeSales.length : 0,
           totalItemsSold: totalItems,
-          averageItemsPerSale: sales.length > 0 ? totalItems / sales.length : 0,
+          averageItemsPerSale: activeSales.length > 0 ? totalItems / activeSales.length : 0,
         });
       }
     } catch (error) {

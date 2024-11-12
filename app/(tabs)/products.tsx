@@ -44,7 +44,7 @@ const ProductList = () => {
   const handleDelete = async (product: Product) => {
     Alert.alert(
       "Delete Product",
-      "Are you sure you want to delete this product?",
+      "Are you sure you want to delete this product? This will hide it from all views but preserve sales history.",
       [
         { text: "Cancel", style: "cancel" },
         {
@@ -54,13 +54,21 @@ const ProductList = () => {
             try {
               const { error } = await supabase
                 .from('products')
-                .delete()
+                .update({ is_active: false })
                 .eq('id', product.id);
               
-              if (error) throw error;
-              await fetchProducts();
+              if (error) {
+                console.error('Supabase update error:', error);
+                Alert.alert('Error', `Failed to delete product: ${error.message}`);
+                return;
+              }
+              
+              // Update local state to remove the product
+              await fetchProducts(); // This will refresh the products list
+              Alert.alert('Success', 'Product deleted successfully');
             } catch (error) {
-              Alert.alert('Error', 'Failed to delete product');
+              console.error('Update error:', error);
+              Alert.alert('Error', 'Failed to delete product. Please try again later.');
             }
           }
         }

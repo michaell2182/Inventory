@@ -45,7 +45,31 @@ interface AddSaleModalProps {
 const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity);
 
 const AddSaleModal = ({ visible, onClose, onSaleComplete }: AddSaleModalProps) => {
-  const { state: { products }, dispatch } = useInventory();
+  const { state: { products, lastUpdated }, fetchProducts } = useInventory();
+  const lastFetchRef = useRef<number>(0);
+  
+  // Add useEffect to refresh products when modal opens
+  React.useEffect(() => {
+    if (visible) {
+      const now = Date.now();
+      // Refresh if data is older than 30 seconds
+      if (now - lastFetchRef.current > 30000) {
+        fetchProducts();
+        lastFetchRef.current = now;
+      }
+      
+      // Reset modal state
+      setSelectedProducts([]);
+      setNotes('');
+      setSaleDate(new Date());
+      setSearchQuery('');
+      setShowNotes(false);
+    }
+  }, [visible]);
+
+  // Add this console log to debug
+  console.log('Available products:', products);
+
   const [selectedProducts, setSelectedProducts] = useState<SelectedProduct[]>([]);
   const [notes, setNotes] = useState('');
   const [saleDate, setSaleDate] = useState(new Date());
@@ -127,10 +151,13 @@ const AddSaleModal = ({ visible, onClose, onSaleComplete }: AddSaleModalProps) =
   };
 
   const filteredProducts = products
-    .filter(product => product.quantity > 0)
     .filter(product => 
-      product.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      product.price.toString().includes(searchQuery)
+      product.is_active &&
+      product.quantity > 0 &&
+      (searchQuery === '' ||
+        product.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        product.price.toString().includes(searchQuery)
+      )
     );
 
   const toggleNotes = () => {
@@ -472,7 +499,8 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     padding: 20,
-    maxHeight: '80%',
+    maxHeight: '90%',
+    minHeight: 400,
   },
   modalTitle: {
     fontSize: 24,
@@ -528,6 +556,8 @@ const styles = StyleSheet.create({
   buttonContainer: {
     flexDirection: 'row',
     gap: 12,
+    marginTop: 16,
+    paddingBottom: Platform.OS === 'ios' ? 20 : 0,
   },
   button: {
     flex: 1,

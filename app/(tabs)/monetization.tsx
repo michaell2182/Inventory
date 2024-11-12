@@ -128,7 +128,7 @@ const MonetizationScreen = () => {
           <View style={styles.planHeader}>
             <Text style={styles.planName}>Premium</Text>
             <Text style={styles.planPrice}>$9.99</Text>
-            <Text style={styles.planBilling}>Forever</Text>
+            <Text style={styles.planBilling}>Yearly</Text>
           </View>
           <View style={styles.planFeatures}>
             <PlanFeature text="Up to 150 products" />

@@ -1,4 +1,4 @@
-export type Product = {
+export interface Product {
     id: string;
     user_id: string;
     title: string;
@@ -9,7 +9,8 @@ export type Product = {
     sku?: string;
     reorder_point?: number;
     created_at?: string;
-};
+    is_active: boolean;
+}
 
 export interface InventoryState {
     products: Product[];

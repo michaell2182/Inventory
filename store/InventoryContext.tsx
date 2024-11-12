@@ -18,6 +18,7 @@ type State = {
   products: Product[];
   isLoading: boolean;
   error: string | null;
+  lastUpdated: number;
 };
 
 type Action =
@@ -32,12 +33,17 @@ const initialState: State = {
   products: [],
   isLoading: false,
   error: null,
+  lastUpdated: 0,
 };
 
 const inventoryReducer = (state: State, action: Action): State => {
   switch (action.type) {
     case 'SET_PRODUCTS':
-      return { ...state, products: action.payload };
+      return {
+        ...state,
+        products: action.payload,
+        lastUpdated: Date.now()
+      };
     case 'ADD_PRODUCT':
       return { ...state, products: [action.payload, ...state.products] };
     case 'UPDATE_PRODUCT':
@@ -90,14 +96,17 @@ export function InventoryProvider({ children }: { children: React.ReactNode }) {
       const { data, error } = await supabase
         .from('products')
         .select('*')
-        .eq('user_id', session?.user?.id)
+        .eq('is_active', true)
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
-      
+      if (error) {
+        console.error('Error fetching products:', error);
+        return;
+      }
+
       dispatch({ type: 'SET_PRODUCTS', payload: data || [] });
-    } catch (error: any) {
-      dispatch({ type: 'SET_ERROR', payload: error.message });
+    } catch (error) {
+      console.error('Error:', error);
     } finally {
       dispatch({ type: 'SET_LOADING', payload: false });
     }

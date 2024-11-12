@@ -83,7 +83,7 @@ const QuickAction = () => {
     <View style={styles.cardHeader}>
       <Text style={styles.cardTitle}>Total Expenses</Text>
       <View style={[styles.badge, styles.negativeBadge]}>
-        <Text style={styles.badgeText}>-1.5%</Text>
+        <Text style={styles.badgeText}>0%</Text>
       </View>
     </View>
     <Text style={styles.amount}>${totalExpenses.toFixed(2)}</Text>
@@ -98,7 +98,7 @@ const QuickAction = () => {
     <View style={styles.cardHeader}>
       <Text style={styles.cardTitle}>Total Revenue</Text>
       <View style={[styles.badge, styles.positiveBadge]}>
-        <Text style={styles.badgeText}>+2.5%</Text>
+        <Text style={styles.badgeText}>0%</Text>
       </View>
     </View>
     <Text style={styles.amount}>${totalRevenue.toFixed(2)}</Text>
